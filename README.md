@@ -1,95 +1,98 @@
 # Edge Speech Denoising Benchmark
 
-One private repository for a unified speech denoising benchmark.
-Phase 1 provides interfaces and configuration only: no model code migration,
-training, dataset downloads, checkpoints, or benchmark scores.
+One private repository for GTCRN, LiSenNet and TF-GridNet under a shared
+waveform-to-waveform interface. No separate model forks or repositories.
+
+## Current status
+
+GTCRN network integration, official VCTK-DEMAND pretrained loading, single-WAV
+inference, pinned data preparation and shared evaluation are implemented.
+LiSenNet/TF-GridNet remain placeholders. Training, validation and losses remain
+Phase 3 placeholders; train.py and validate.py are independent entry points.
+No training has been performed. Pretrained scores are not controlled-training
+comparisons. Keep the repository private in GitHub settings.
 
 ## Dataset
 
 **VoiceBank-DEMAND-16k**, a standard speech enhancement benchmark.
+Train split: **11572**. Test split: **824**, fixed following dataset protocol.
 
-- Train split: **11572** paired utterances.
-- Test split: **824** paired utterances.
-- The test split is fixed following the dataset protocol.
-- Validation will be a reproducible subset of the training split; never use
-  the test split for validation, checkpoint selection, or tuning.
-- Future data preparation must pin the source/revision and record paired IDs,
-  sample rate, file hashes, and split membership in manifests.
-- Data paths are intentionally unset. Data stays outside Git.
+HF source: https://huggingface.co/datasets/JacobLinCool/VoiceBank-DEMAND-16k
+Revision: `20879f4f9aab3d0b9263993667e7711a3ae1416d`.
+The source card labels it CC-BY-4.0. `configs/voicebank.json` pins file hashes.
+Data remains outside Git. Preparation checks all audio pairs and writes sorted
+manifests with audio hashes. Validation must later be split from train; test
+cannot be used for tuning or checkpoint selection.
 
 ## Baseline models
 
-- **GTCRN**: lightweight real-time speech enhancement model.
+- **GTCRN**: lightweight real-time speech enhancement model. The current
+  adapter uses whole-utterance STFT; this is not a stateful streaming claim.
 - **LiSenNet**: lightweight sub-band and dual-path speech enhancement model.
 - **TF-GridNet**: time-frequency modeling based speech enhancement model.
 
-Each adapter accepts a floating-point mono waveform `[batch, samples]` at
-16 kHz and returns an aligned waveform of the same shape, sample rate,
-device, and dtype. Native STFT, padding, and inverse transforms belong inside
-adapters. Streaming/causality capabilities must be documented separately;
-sharing an interface does not imply equal latency or streaming support.
-The three adapters currently raise `NotImplementedError`.
+All adapters accept and return aligned mono `[batch, samples]` at 16 kHz.
+Native feature processing belongs inside each adapter. `build_model("gtcrn")`
+constructs a random-weight model. Pretrained weights must be explicitly loaded
+with `load_gtcrn_checkpoint`; single-file and evaluation scripts do this.
+GTCRN attribution and MIT license are retained beside its network source.
+
+## Setup and evaluation
+
+Python 3.10+ and PyTorch are required. For the evaluation extras:
+
+```bash
+python -m pip install -r requirements-benchmark.txt
+python -m scripts.smoke_benchmark
+python -m scripts.prepare_data --split test
+python -m scripts.evaluate --metrics stoi si_snr si_snr_improvement --limit 5 --output results/gtcrn_test5.json
+```
+
+Preparation downloads only the 132 MB test shard by default. Use `--split all`
+only when both train and test are needed (about 2.28 GB of parquet downloads).
+`--parquet PATH` accepts a manually downloaded pinned test shard.
+
+The five-utterance run is an integration check, not the full benchmark. For all
+824 test utterances with the selected metrics, remove `--limit 5`:
+
+```bash
+python -m scripts.evaluate --metrics stoi si_snr si_snr_improvement
+```
+
+PESQ uses the standard `pesq` backend; it may require a C compiler to install.
+After installing it, `python -m scripts.evaluate` computes all quality metrics.
+Missing backends abort the requested run; explicitly omitted metrics are
+recorded as not computed, without substitute or fabricated scores.
 
 ## Evaluation
 
-All models will use `evaluate(model, dataset)` and one shared metric module:
+One `evaluate(model, dataset)` implementation supplies all model adapters:
 
 - PESQ (16 kHz wideband)
-- STOI
+- STOI (classical)
 - SI-SNR (dB)
-- SI-SNR improvement (enhanced SI-SNR minus noisy SI-SNR, dB)
-- RTF (inference seconds / audio duration seconds)
-- Parameter count (all registered parameters)
+- SI-SNR improvement (enhanced minus noisy SI-SNR, dB)
+- RTF (inference seconds / audio duration)
+- Parameter count (all, with trainable count reported separately)
 
-Metrics are interfaces only in Phase 1; no scores are fabricated. Future RTF
-measurements must record hardware, device, precision, threads, batch size,
-warmup, synchronization, and whether frontend/transfer time is included.
-Quality scores will be averaged per utterance over the full fixed test set.
-
-## Setup and entry points
-
-Python 3.10 or newer:
-
-```bash
-python -m venv .venv
-# Activate the environment using your operating system's command.
-python -m pip install -r requirements.txt
-python -m scripts.prepare_data --config configs/default.yaml
-python -m scripts.train --config configs/gtcrn.yaml
-python -m scripts.validate --config configs/gtcrn.yaml
-python -m scripts.inference --config configs/gtcrn.yaml
-python -m scripts.evaluate --config configs/gtcrn.yaml
-```
-
-Entry points validate the configuration and exit with an explicit Phase 1
-placeholder message. They do not download data or weights or execute models.
-Training and validation have separate entry points. Model configs inherit
-`default.yaml`; paths are resolved relative to the repository root.
+Reports include noisy baseline, per-utterance scores, metric coverage, source
+revision, manifest fingerprint, checkpoint provenance and timing conditions.
+Default efficiency protocol: CPU FP32, batch=1, one thread, one warmup and
+three timed runs per utterance. RTF includes STFT/network/iSTFT, excludes file
+I/O, transfers and metric computation. Full protocol: `docs/benchmark_protocol.md`.
 
 ## Future plan
 
-1. **Phase 1: Framework setup** — shared interfaces, configs, separate scripts.
-2. **Phase 2: Integrate pretrained checkpoints** — audit upstream licenses and
-   revisions; extract only necessary definitions/inference code; map weights;
-   verify waveform alignment and compare with upstream outputs. Record native
-   checkpoint training settings; report these as pretrained comparisons.
-3. **Phase 3: Unified training pipeline** — implement paired manifests, a fixed
-   train/validation split, losses, optimizer, seeds, and resumable training.
-   `train.py` trains only; `validate.py` handles validation independently.
-4. **Phase 4: Controlled benchmark comparison** — fix data, training budget,
-   selection rule, metric implementation, and measurement hardware; evaluate
-   all three adapters on the same 824 test utterances.
+1. **Phase 1: Framework setup** — complete.
+2. **Phase 2: Integrate pretrained checkpoints** — GTCRN complete; integrate
+   LiSenNet and TF-GridNet next, with license/revision and output checks.
+3. **Phase 3: Unified training pipeline** — shared data splits, loss, budget,
+   reproducible seeds and selection rule; validation stays separate from train.
+4. **Phase 4: Controlled benchmark comparison** — same fixed test manifest,
+   metric code and hardware under matched training/measurement conditions.
 
-## Integration order and provenance
-
-Integrate GTCRN first, LiSenNet second, TF-GridNet third. For each, retain only
-necessary model definitions, training, inference, and evaluation logic behind
-these interfaces. Do not fork or copy entire upstream repositories or create
-separate model repositories. Preserve required attribution and license texts
-when code is integrated. Do not assign an upstream license to this new code
-without a deliberate licensing decision.
+Extract only necessary definitions/training/inference/evaluation logic; do not
+copy complete upstream repositories. Record source revisions, required notices,
+checkpoint training provenance and architectural capabilities for each adapter.
 
 Architecture reference: https://github.com/kittytinglee/edge-kws-benchmark
-(shared waveform interface and separation of preliminary and controlled results).
-The repository must remain private; configuration files cannot enforce GitHub
-visibility, which must be set on GitHub.

@@ -1,0 +1,42 @@
+{
+  "dataset": "JacobLinCool/VoiceBank-DEMAND-16k",
+  "revision": "20879f4f9aab3d0b9263993667e7711a3ae1416d",
+  "license": "cc-by-4.0",
+  "sample_rate": 16000,
+  "expected_counts": {
+    "train": 11572,
+    "test": 824
+  },
+  "files": [
+    {
+      "path": "data/test-00000-of-00001.parquet",
+      "size": 132200447,
+      "sha256": "08b43dbea4a15a5f3067233f5cb2de3e5c9a600a3ae5b969661740778f642c87"
+    },
+    {
+      "path": "data/train-00000-of-00005.parquet",
+      "size": 444302320,
+      "sha256": "d8195194a27e8d007502d6eacf5e0fac71adb9fe343ee228b78bae3559464319"
+    },
+    {
+      "path": "data/train-00001-of-00005.parquet",
+      "size": 416366498,
+      "sha256": "d8a5c932846399a7021b544157b25bfce736122f66a27239c13bbb9262aa98bc"
+    },
+    {
+      "path": "data/train-00002-of-00005.parquet",
+      "size": 430855381,
+      "sha256": "e486e0782f9c978cd2ea08fb25dbe1694cc4c87efaecde8b04308e683db8a91c"
+    },
+    {
+      "path": "data/train-00003-of-00005.parquet",
+      "size": 444005802,
+      "sha256": "6cf3cc86af272546cb94c1e8d26088b3a15feef1f662b145cea86a7c33387b6f"
+    },
+    {
+      "path": "data/train-00004-of-00005.parquet",
+      "size": 415510617,
+      "sha256": "2afbf89fc0b9e651f7990ff17d247ab18803d463842281a67c4a6b7c25abc7b2"
+    }
+  ]
+}
