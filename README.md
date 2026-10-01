@@ -108,6 +108,16 @@ It performs no training, downloads or dataset quality evaluation. Parameters:
 36,783 total/trainable. The shared `evaluate(model, dataset)` accepts the adapter;
 the CLI still rejects LiSenNet until audited pretrained loading is implemented.
 
+## LiSenNet checkpoint audit
+
+The official architecture is integrated, but its main pretrained baseline is
+pending. A third-party GRU checkpoint strictly matches all 102 generator state
+entries; its published recipe uses test for validation and g_best selection.
+Checkpoint-specific selection logs are absent, so it is excluded from the main
+held-out comparison pending independent provenance. See
+`docs/lisennet_checkpoint_audit.md` and its JSON evidence. No LiSenNet quality
+score has been generated. TF-GridNet architecture integration is next.
+
 ## Future plan
 
 1. **Phase 1: Framework setup** — complete.

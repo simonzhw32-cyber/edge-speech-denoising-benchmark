@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "review_date": "2026-10-02",
+  "timezone": "Asia/Shanghai",
+  "model": "lisennet",
+  "decision": "pretrained_main_baseline_pending",
+  "official_source": {
+    "repository": "https://github.com/hyyan2k/LiSenNet",
+    "revision": "df4e481aa706fbc344d1013f7a1cbfd46228c8ab",
+    "checkpoint_status": "no_public_checkpoint_found_in_inspected_tree_releases_or_issue_comments"
+  },
+  "candidate": {
+    "publisher": "claroche1",
+    "source_type": "third_party_reproduction",
+    "model_repository": "https://huggingface.co/claroche1/LiSenNet",
+    "model_revision": "4fe3356f04dc3cebb32335e0c194bb6284c695f8",
+    "file": "gru/g_best",
+    "bytes": 177557,
+    "sha256": "f983e79d7018ec7e0df6d5cb457b2178d78c019c759f266cc5bb83f463e0b8d5",
+    "config": {
+      "_comment": "LiSenNet (arXiv:2409.13285, hyyan2k/LiSenNet, MIT) ported into this framework. Hyperparameters follow the upstream config.yaml: VoiceBank-DEMAND, n_fft=512/hop=256, 2 s segments, AdamW lr 5e-4 betas [0.8,0.99], StepLR gamma 0.98/epoch, CMGAN losses (complex 0.1, mag 0.9, adv 0.05). num_channels=16, n_blocks=2 -> ~37k-param generator. Phase via Griffin-Lim (no phase loss). batch_size is 16 (not the paper's 4): the model is tiny (0.77 GB at batch 16) but each step pays a fixed CPU-PESQ + Griffin-Lim cost, so batch 4 is needlessly slow (~32 min/epoch vs ~4.3 at batch 16); per-sample norms make MetricGAN batch-robust.",
+      "num_gpus": 0,
+      "batch_size": 16,
+      "learning_rate": 0.0005,
+      "adam_b1": 0.8,
+      "adam_b2": 0.99,
+      "lr_decay": 0.98,
+      "seed": 1234,
+      "sampling_rate": 16000,
+      "segment_size": 32000,
+      "n_fft": 512,
+      "hop_size": 256,
+      "win_size": 512,
+      "num_channels": 16,
+      "n_blocks": 2,
+      "compress_factor": 0.3,
+      "gradient_clip": 5.0,
+      "loss": {
+        "complex": 0.1,
+        "mag": 0.9,
+        "adv": 0.05
+      },
+      "num_workers": 4,
+      "dist_config": {
+        "dist_backend": "nccl",
+        "dist_url": "tcp://localhost:54321",
+        "world_size": 1
+      }
+    },
+    "compatibility": {
+      "torch_load_weights_only": true,
+      "container_keys": [
+        "generator"
+      ],
+      "state_entries": 102,
+      "missing_keys": [],
+      "unexpected_keys": [],
+      "shape_mismatches": [],
+      "strict_generator_load": "pass",
+      "total_parameters": 36783,
+      "trainable_parameters": 36783,
+      "end_to_end_pretrained_reference_equivalence": "not_completed"
+    },
+    "training_source": {
+      "repository": "https://github.com/LarocheC/eco8-neaixt",
+      "revision": "b72d38e91874752ced772ab662ee5390776019a5",
+      "file": "lisennet/train.py",
+      "sha256": "158153aa2062be29b170557f93d56128999b411b7d3034dced4949017ecbb43c",
+      "validation_split_in_published_recipe": "test",
+      "checkpoint_selection_in_published_recipe": "maximum validation PESQ; writes g_best",
+      "evidence_regions": [
+        [
+          181,
+          188
+        ],
+        [
+          224,
+          230
+        ]
+      ],
+      "actual_checkpoint_training_logs": "not_available_in_checkpoint",
+      "checkpoint_contains_epoch_or_selection_metadata": false
+    },
+    "disposition": "exclude_from_main_held_out_comparison_pending_independent_training_and_selection_provenance",
+    "reason": "Published recipe uses the benchmark test split for validation and checkpoint selection. Actual checkpoint-specific selection logs are absent, so a held-out claim cannot be established.",
+    "quality_scores_generated_by_this_audit": false
+  },
+  "next_steps": [
+    "Retain the verified official LiSenNet architecture and waveform adapter.",
+    "Audit author-provided or independently selected weights if available.",
+    "Implement training/validation selection from the train split in Phase 3.",
+    "Proceed with TF-GridNet architecture integration using the existing shared waveform and metric interfaces."
+  ]
+}
