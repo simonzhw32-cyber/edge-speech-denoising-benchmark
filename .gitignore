@@ -20,3 +20,15 @@ datasets/
 /results/*
 !/results/.gitkeep
 .DS_Store
+
+# Track dataset Python source
+!speech_denoising/datasets/
+!speech_denoising/datasets/*.py
+
+# Track dataset Python source
+!speech_denoising/datasets/
+!speech_denoising/datasets/*.py
+
+# Track dataset Python source
+!speech_denoising/datasets/
+!speech_denoising/datasets/*.py
