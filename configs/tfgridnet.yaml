@@ -1,4 +1,22 @@
-extends: default.yaml
-model:
-  name: tfgridnet
-  checkpoint: null
+# Local 16 kHz enhancement profile; random weights, not a pretrained recipe.
+model: tfgridnet
+sample_rate: 16000
+model_params:
+  n_fft: 512
+  stride: 256
+  n_layers: 6
+  lstm_hidden_units: 192
+  attn_n_head: 4
+  attn_approx_qk_dim: 512
+  emb_dim: 48
+  emb_ks: 4
+  emb_hs: 1
+  activation: prelu
+  eps: 0.00001
+protocol:
+  variant: espnet_original_tfgridnet
+  input_channels: 1
+  output_sources: 1
+  window: hann
+  mode: offline_whole_utterance
+  weights: random

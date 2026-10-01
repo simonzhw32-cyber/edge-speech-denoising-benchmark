@@ -8,8 +8,8 @@ waveform-to-waveform interface. No separate model forks or repositories.
 GTCRN network integration, official VCTK-DEMAND pretrained loading, single-WAV
 inference, pinned data preparation and shared evaluation are implemented.
 LiSenNet network and waveform adapter are integrated and verified against the
-pinned upstream generator, with random weights only. TF-GridNet remains a
-placeholder. Training, validation and losses remain Phase 3 placeholders;
+pinned upstream generator, with random weights only. Original TF-GridNet
+network and offline mono waveform adapter are also integrated with random weights. Training, validation and losses remain Phase 3 placeholders;
 train.py and validate.py are independent entry points.
 No training has been performed. Pretrained scores are not controlled-training
 comparisons. Keep the repository private in GitHub settings.
@@ -34,6 +34,8 @@ cannot be used for tuning or checkpoint selection.
   The native two-iteration Griffin-Lim path is retained for offline inference.
   Network/adapter checks pass; no pretrained weights or quality scores yet.
 - **TF-GridNet**: time-frequency modeling based speech enhancement model.
+  Original ESPnet variant, with bidirectional LSTMs and global attention; offline.
+  Local 16 kHz mono single-output profile; no pretrained weights or quality scores.
 
 All adapters accept and return aligned mono `[batch, samples]` at 16 kHz.
 Native feature processing belongs inside each adapter. `build_model("gtcrn")`
@@ -41,7 +43,8 @@ constructs a random-weight model. Pretrained weights must be explicitly loaded
 with `load_gtcrn_checkpoint`; single-file and evaluation scripts do this.
 GTCRN and LiSenNet attribution and original MIT notices are retained beside
 their network sources. LiSenNet normalization and phase reconstruction are
-documented in `speech_denoising/models/lisennet/SOURCE.md`.
+documented in `speech_denoising/models/lisennet/SOURCE.md`. TF-GridNet keeps the
+ESPnet Apache-2.0 license and pinned provenance in its own `SOURCE.md`.
 
 ## Setup and evaluation
 
@@ -116,14 +119,29 @@ entries; its published recipe uses test for validation and g_best selection.
 Checkpoint-specific selection logs are absent, so it is excluded from the main
 held-out comparison pending independent provenance. See
 `docs/lisennet_checkpoint_audit.md` and its JSON evidence. No LiSenNet quality
-score has been generated. TF-GridNet architecture integration is next.
+score has been generated.
+
+## TF-GridNet architecture verification
+
+```bash
+python -m scripts.smoke_tfgridnet
+```
+
+Uses random weights and a pinned embedded ESPnet reference, including its original
+STFT frontend. Verifies strict state loading, waveform equivalence, alignment,
+short/silent audio, gradients and the shared evaluator with a synthetic fixture.
+No checkpoint, optimizer step or dataset quality report is generated.
+Parameters: 8,381,504 total/trainable; 540 network state entries. The local
+profile uses FFT=512/hop=256, six blocks, hidden=192 and embedding=48; it is not a
+published pretrained recipe. `configs/tfgridnet.yaml` records the full profile.
+The CLI remains restricted to GTCRN until other checkpoint provenance is audited.
 
 ## Future plan
 
 1. **Phase 1: Framework setup** — complete.
-2. **Phase 2: Integrate pretrained checkpoints** — GTCRN complete; integrate
-   LiSenNet architecture/adapter verified, checkpoint integration pending;
-   TF-GridNet integration pending. Audit licenses/revisions and native outputs.
+2. **Phase 2: Integrate pretrained checkpoints** — all three architectures
+   integrated; GTCRN pretrained loading complete. LiSenNet and TF-GridNet
+   pretrained baselines pending provenance and compatible configuration audits.
 3. **Phase 3: Unified training pipeline** — shared data splits, loss, budget,
    reproducible seeds and selection rule; validation stays separate from train.
 4. **Phase 4: Controlled benchmark comparison** — same fixed test manifest,
