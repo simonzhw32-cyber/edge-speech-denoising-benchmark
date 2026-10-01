@@ -1,0 +1,27 @@
+project: edge-speech-denoising-benchmark
+phase: 1
+seed: 42
+model:
+  name: null
+  checkpoint: null
+dataset:
+  name: VoiceBank-DEMAND-16k
+  sample_rate: 16000
+  train_count: 11572
+  test_count: 824
+  test_split_fixed: true
+  root: null
+  train_manifest: null
+  validation_manifest: null
+  test_manifest: null
+training:
+  enabled: false
+  batch_size: 1
+  epochs: null
+evaluation:
+  metrics: [pesq, stoi, si_snr, si_snr_improvement, rtf, parameter_count]
+  device: cpu
+  batch_size: 1
+output:
+  checkpoints: checkpoints
+  results: results

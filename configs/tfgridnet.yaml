@@ -1,0 +1,4 @@
+extends: default.yaml
+model:
+  name: tfgridnet
+  checkpoint: null

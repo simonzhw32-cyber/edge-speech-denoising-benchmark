@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "edge-speech-denoising-benchmark"
+version = "0.1.0"
+description = "Unified edge speech denoising benchmark skeleton"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = ["torch>=2.1", "numpy>=1.24", "soundfile>=0.12", "PyYAML>=6.0"]
+
+[tool.setuptools.packages.find]
+include = ["speech_denoising*", "scripts*"]
+namespaces = true
