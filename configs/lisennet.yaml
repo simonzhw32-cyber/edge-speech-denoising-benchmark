@@ -2,3 +2,11 @@ extends: default.yaml
 model:
   name: lisennet
   checkpoint: null
+  parameters:
+    num_channels: 16
+    n_blocks: 2
+    n_fft: 512
+    hop_length: 256
+    compress_factor: 0.3
+# Constructors use these official defaults; automatic training config wiring
+# remains Phase 3 work. No pretrained weights are installed in this phase.

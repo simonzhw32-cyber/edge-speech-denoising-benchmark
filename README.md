@@ -7,8 +7,10 @@ waveform-to-waveform interface. No separate model forks or repositories.
 
 GTCRN network integration, official VCTK-DEMAND pretrained loading, single-WAV
 inference, pinned data preparation and shared evaluation are implemented.
-LiSenNet/TF-GridNet remain placeholders. Training, validation and losses remain
-Phase 3 placeholders; train.py and validate.py are independent entry points.
+LiSenNet network and waveform adapter are integrated and verified against the
+pinned upstream generator, with random weights only. TF-GridNet remains a
+placeholder. Training, validation and losses remain Phase 3 placeholders;
+train.py and validate.py are independent entry points.
 No training has been performed. Pretrained scores are not controlled-training
 comparisons. Keep the repository private in GitHub settings.
 
@@ -29,13 +31,17 @@ cannot be used for tuning or checkpoint selection.
 - **GTCRN**: lightweight real-time speech enhancement model. The current
   adapter uses whole-utterance STFT; this is not a stateful streaming claim.
 - **LiSenNet**: lightweight sub-band and dual-path speech enhancement model.
+  The native two-iteration Griffin-Lim path is retained for offline inference.
+  Network/adapter checks pass; no pretrained weights or quality scores yet.
 - **TF-GridNet**: time-frequency modeling based speech enhancement model.
 
 All adapters accept and return aligned mono `[batch, samples]` at 16 kHz.
 Native feature processing belongs inside each adapter. `build_model("gtcrn")`
 constructs a random-weight model. Pretrained weights must be explicitly loaded
 with `load_gtcrn_checkpoint`; single-file and evaluation scripts do this.
-GTCRN attribution and MIT license are retained beside its network source.
+GTCRN and LiSenNet attribution and original MIT notices are retained beside
+their network sources. LiSenNet normalization and phase reconstruction are
+documented in `speech_denoising/models/lisennet/SOURCE.md`.
 
 ## Setup and evaluation
 
@@ -81,11 +87,33 @@ Default efficiency protocol: CPU FP32, batch=1, one thread, one warmup and
 three timed runs per utterance. RTF includes STFT/network/iSTFT, excludes file
 I/O, transfers and metric computation. Full protocol: `docs/benchmark_protocol.md`.
 
+## Verified integration status
+
+GTCRN pretrained evaluation on the full fixed 824-utterance test split is saved
+in `benchmark_reports/gtcrn_pretrained_voicebank_test824_windows.json`.
+That Windows run reports PESQ-WB=2.86969, STOI=0.94029, SI-SNR=18.79606 dB,
+SI-SNR improvement=10.35052 dB, with zero metric failures. RTF=0.01557 applies
+only to that recorded machine/offline protocol, not to a target edge device.
+The dependency snapshot is `benchmark_reports/gtcrn_windows_environment.txt`.
+This is a pretrained baseline, not a controlled-training model comparison.
+
+For LiSenNet architecture/adapter verification:
+
+```bash
+python -m scripts.smoke_lisennet
+```
+
+This uses random weights, an embedded pinned reference and a synthetic fixture.
+It performs no training, downloads or dataset quality evaluation. Parameters:
+36,783 total/trainable. The shared `evaluate(model, dataset)` accepts the adapter;
+the CLI still rejects LiSenNet until audited pretrained loading is implemented.
+
 ## Future plan
 
 1. **Phase 1: Framework setup** — complete.
 2. **Phase 2: Integrate pretrained checkpoints** — GTCRN complete; integrate
-   LiSenNet and TF-GridNet next, with license/revision and output checks.
+   LiSenNet architecture/adapter verified, checkpoint integration pending;
+   TF-GridNet integration pending. Audit licenses/revisions and native outputs.
 3. **Phase 3: Unified training pipeline** — shared data splits, loss, budget,
    reproducible seeds and selection rule; validation stays separate from train.
 4. **Phase 4: Controlled benchmark comparison** — same fixed test manifest,
