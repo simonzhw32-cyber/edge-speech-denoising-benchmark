@@ -140,5 +140,8 @@ The [entry-point fixture](docs/training_runner.md) checks train/validate persist
 and resumed synthetic updates with `python -m scripts.smoke_training_runner`.
 The [data preflight](docs/training_preflight.md) has a synthetic WAV/subset check
 through `python -m scripts.smoke_training_preflight`; it performs no model updates.
+The [bounded resource probe](docs/training_probe.md) checks one configured train
+batch and one full validation utterance on an explicit device, without optimizer
+steps. A passing probe does not yet enable real-data training.
 
 Framework reference: [edge-kws-benchmark](https://github.com/kittytinglee/edge-kws-benchmark).

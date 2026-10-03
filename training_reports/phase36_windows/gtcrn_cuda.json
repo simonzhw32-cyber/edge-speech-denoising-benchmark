@@ -1,0 +1,163 @@
+{
+  "schema_version": 1,
+  "scope": "bounded_training_resource_probe",
+  "result": {
+    "status": "passed",
+    "stages": {
+      "train_batch": {
+        "status": "passed",
+        "input_shape": [
+          4,
+          64000
+        ],
+        "valid_lengths": [
+          36480,
+          62400,
+          64000,
+          64000
+        ],
+        "backward": true,
+        "baseline_allocated_bytes": 281088,
+        "parameters_with_gradients": 203,
+        "finite_output": true,
+        "finite_loss": true,
+        "seconds": 2.04544739999983,
+        "peak_allocated_bytes": 323855872,
+        "peak_reserved_bytes": 371195904
+      },
+      "validation_utterance": {
+        "status": "passed",
+        "input_shape": [
+          1,
+          185760
+        ],
+        "valid_lengths": [
+          185760
+        ],
+        "backward": false,
+        "baseline_allocated_bytes": 67389952,
+        "finite_output": true,
+        "finite_loss": true,
+        "seconds": 0.09618390000105137,
+        "peak_allocated_bytes": 112600064,
+        "peak_reserved_bytes": 371195904
+      }
+    },
+    "optimizer_steps": 0,
+    "parameters_unchanged": true,
+    "buffers_restored": true
+  },
+  "model": "gtcrn",
+  "model_settings": {
+    "config": "configs/gtcrn.yaml",
+    "profile": "native_default",
+    "initialization": "random",
+    "constructor_kwargs": {},
+    "config_sha256": "bfc9b1384aba8fca8d765a972861c7c23bb777da5cc5e4a7da6732807ac02d7e"
+  },
+  "parameters": {
+    "all": 48245,
+    "trainable": 23669
+  },
+  "plan_sha256": "42fc7ddc114aa6368161f86e007bf7cf6b7e277a1796de1fc21df536f6d5528f",
+  "protocol_sha256": "4a7242c5363d4a342c7cc96edc65f764bb0106f6e2a4f62c158e8dd5e5ff7305",
+  "split_sha256": "0a1ebb0028dfa7d4a5c7971636e54a7a14576d13d8a0760537e1668361f5d220",
+  "manifest_sha256": "5f3d34bedafe1782c532c5f40851e322997c7bfa23694dba29fed570f379f6ef",
+  "preflight_sha256": "dc24d0097da2181ab1eab2cabbf2a297cb882f71f4595148c6e2811eb3caabf5",
+  "selection": {
+    "train_ids": [
+      "p226_001",
+      "p226_002",
+      "p226_003",
+      "p226_004"
+    ],
+    "validation_id": "p256_023",
+    "validation_samples": 185760,
+    "segment_samples": 64000,
+    "seed": 42,
+    "epoch": 1,
+    "crop_starts": [
+      0,
+      0,
+      10072,
+      13318
+    ],
+    "valid_lengths": [
+      36480,
+      62400,
+      64000,
+      64000
+    ]
+  },
+  "runtime": {
+    "python": "3.13.16",
+    "torch": "2.14.1+cu130",
+    "numpy": "2.5.3",
+    "cuda_build": "13.0",
+    "device": "cuda:0",
+    "platform": "Windows-11-10.0.22631-SP0",
+    "cpu_threads": 8,
+    "interop_threads": 8,
+    "autocast": false,
+    "tensor_dtype": "float32",
+    "matmul_tf32": false,
+    "cudnn_tf32": true,
+    "cudnn_benchmark": false,
+    "deterministic_algorithms": false,
+    "gpu": "NVIDIA GeForce RTX 5060",
+    "compute_capability": [
+      12,
+      0
+    ],
+    "gpu_total_bytes": 8546484224,
+    "gpu_free_bytes_before_model": 7359954944
+  },
+  "source_fingerprints": {
+    "configs/default.yaml": "fc07fff636e2ef9e9efc9923c89675b16cc346428d14f7fd5ce253f33b7bcb62",
+    "configs/voicebank.json": "84e498e77a6c038b335482bf3272af98118ce82812e6b8e4875e4c99462e01a6",
+    "configs/training_protocol.yaml": "7222e3b94fbdff817a617096a803016fecce200ccdba49f42dc5181f82ca279d",
+    "configs/gtcrn.yaml": "bfc9b1384aba8fca8d765a972861c7c23bb777da5cc5e4a7da6732807ac02d7e",
+    "scripts/plan_training.py": "489991278688c9b8fd271604ca7de9251761f28259acc8e2738a64d5b73b9959",
+    "scripts/probe_training.py": "121bef274d0f53f60dad20b15ac8fc462a554e793223ed750d2fc328d1d471ab",
+    "speech_denoising/__init__.py": "10da722ac6c0a2c3cfd5dc80e2bcae4227833d312510736b0ac892c71409df53",
+    "speech_denoising/datasets/__init__.py": "6b51668c0ba6c88e54d33f9029951cf51bf27fc38864cebc0bde751829688f94",
+    "speech_denoising/datasets/voicebank.py": "15e387cd9a9cc2723773b3f48ae3caa5773270a443f9fbe64d8cd04407405993",
+    "speech_denoising/losses/loss.py": "591f022c00593c34b353c90129efaf84ab427b30f0e8ec7a7714e18172798609",
+    "speech_denoising/metrics/__init__.py": "f9f605f0744e007851322684d0b737d8c1a581b2ff4a001ddfc594e702c2623a",
+    "speech_denoising/metrics/audio_metrics.py": "11fb7a68a79abb64620d5e8c816f777cef7b367595d1bc3335839faf81da6cd2",
+    "speech_denoising/models/__init__.py": "d6b811ca0a6cdd7502b043a7d923a15dbd48d561115041c235e279d4d01d49a8",
+    "speech_denoising/models/base.py": "dd8a34b2cfcf5895d2f76b7f9fb16edffaa97accf8c15d2c5d5b3bddd09d80b5",
+    "speech_denoising/models/gtcrn/checkpoint.py": "440375b8aefef1ac3c929ddc8195107b13f66dd64e92351160562d49d2668489",
+    "speech_denoising/models/gtcrn/model.py": "e5b29cd019daca68b459e2e20e8b9ca571f9d931c95b6c7168acf9cf2b21e082",
+    "speech_denoising/models/gtcrn/network.py": "a9a2a8268c682318b58bedc2c9627764fb9397e95adc62c491e885657e0bd9c7",
+    "speech_denoising/models/lisennet/dpr_layer.py": "2108c05517d0f82763ef374b9858a477b11a35a56b295a0492f4bf64ce10c5a3",
+    "speech_denoising/models/lisennet/model.py": "3b8c1be5d2963e9221fac55736c80bd5bd685050c5885bdda41de07b951e780a",
+    "speech_denoising/models/lisennet/network.py": "bb45dffa1cc5e110f7549cc98c5519e0eb61437fdecaa40846e2a38347529dfc",
+    "speech_denoising/models/tfgridnet/assets.py": "0d37607df576a1874ecbff22d96b0b0cf2bb04f7269d6069e8b07ba6460682c8",
+    "speech_denoising/models/tfgridnet/checkpoint.py": "f58120d19dee811ecfde763a5a16927f2badddddc4a199320e2dc3bfbeec5d01",
+    "speech_denoising/models/tfgridnet/model.py": "2357b33a7948d7ac791250574b52fe057ead9723f8c538f94ac8858cf69c77a8",
+    "speech_denoising/models/tfgridnet/network.py": "1e2eea9e2caa42c5a54ac671f042940293cd496b392fd8f153642db364b816da",
+    "speech_denoising/models/tfgridnet/profiles.py": "2ec2bda08e1f3d850f7dd144f9e09b13552a8c0e152262ec2d7a5ab97faf35c4",
+    "speech_denoising/models/tfgridnet/spectral.py": "a79935743938ccba2fbf7757a373d7b746dbaeaa84cdef4149814aadaf2285ad",
+    "speech_denoising/training/__init__.py": "ed673b8581b465994a3c8b345b2b70471f524799899feefdad438e279b05dfa5",
+    "speech_denoising/training/batching.py": "5af6b9dbae1e607c2a841dbf68525a259139ce11c10b6713aaaf972d99f5c4da",
+    "speech_denoising/training/data.py": "f99b585ad6578036e1aa55c225dbf1a387b1ae31b347efb734a218357228bba4",
+    "speech_denoising/training/fixture.py": "80d5abff7379b980575109f4381f8d415bb4f152bf3259fab5eee67bf4ebf203",
+    "speech_denoising/training/preflight.py": "3730728f365f2208494a9025f767418c55b87ca0414d21cda04d4da721fccbc2",
+    "speech_denoising/training/probe.py": "08fd1bda174cc47fb8033d5cc48b123adca12a68e48264eead119b09912d5609",
+    "speech_denoising/training/protocol.py": "3147b22ad6993baf09147b80b6d25030e43ae220fce873333b15261f7a28d0a8",
+    "speech_denoising/training/run_store.py": "58025d6f73db8c2a6a7d5c3037bb287c52ad349aca557c09119fd97e06494c24",
+    "speech_denoising/training/runner.py": "2e4a330613ab6b4edd11b182f7d7a3318d55119a17913fcd0fc7b538b0101286",
+    "speech_denoising/training/selection.py": "76137caa5e860f937af7f8c68a1dfb258e81eecc5794078fbed517b5dce5dd42",
+    "speech_denoising/training/state.py": "549e212e57769f245f637945a5100bfffaeb0639304fd97e7dc92ba07b50fca0",
+    "speech_denoising/training/validation.py": "78a92fc45f39eb1ddd81bb24b03c0f69cd775f50519fe7eb3f702cda3de5733f",
+    "speech_denoising/utils/utils.py": "c8e34a5d2195564ae2bf863544133662580e717f3fe9f873e1917ff387d466d9"
+  },
+  "checkpoint_loaded": false,
+  "optimizer_created": false,
+  "training_performed": false,
+  "quality_scores_generated": false,
+  "complete_validation": false,
+  "test_audio_read": false,
+  "execution_ready": false
+}
