@@ -18,7 +18,8 @@ four-layer `dns_ins20_epoch33` profile (2,552,790 parameters).
 
 Training and validation remain separate configuration-only entry points.
 A shared valid-length waveform loss and paired crop/batch utilities are available;
-the optimizer loop and validation orchestration are not implemented.
+epoch-state, independent validation and selection components are also available.
+The optimizer loop and entry-point orchestration are not implemented.
 
 ## Recorded pretrained results
 
@@ -131,5 +132,7 @@ The [training draft](docs/training_protocol.md) adds a speaker-disjoint split
 planner and synthetic checks. It does not execute training or verify local audio.
 The [waveform components](docs/training_components.md) provide loss and batch
 checks through `python -m scripts.smoke_training_components`.
+[State and validation components](docs/training_state.md) add an epoch-boundary
+resume fixture and selection checks through `python -m scripts.smoke_training_state`.
 
 Framework reference: [edge-kws-benchmark](https://github.com/kittytinglee/edge-kws-benchmark).

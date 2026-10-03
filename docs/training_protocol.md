@@ -93,7 +93,8 @@ settings and their source-config fingerprint are recorded separately.
 
 ## Remaining implementation
 
-Implement seeded training and resume state, separate validation and
-checkpoint-selection orchestration on top of the waveform components. Verify
-those additions on synthetic fixtures before a small hardware feasibility run.
+Epoch state, independent validation and the selection rule are implemented as
+[reusable components](training_state.md). Seeded training, separate entry-point
+orchestration and persisted selection history remain to be implemented. Verify
+that runner on synthetic fixtures before a small hardware feasibility run.
 Only after that should the training protocol be frozen and full training begin.
