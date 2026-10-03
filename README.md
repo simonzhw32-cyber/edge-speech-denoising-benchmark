@@ -136,6 +136,22 @@ profile uses FFT=512/hop=256, six blocks, hidden=192 and embedding=48; it is not
 published pretrained recipe. `configs/tfgridnet.yaml` records the full profile.
 The CLI remains restricted to GTCRN until other checkpoint provenance is audited.
 
+## TF-GridNet checkpoint audit
+
+Phase 2.8 records source provenance, hashes and tensor metadata in
+`docs/tfgridnet_checkpoint_audit.md` and its JSON evidence. The preferred next
+candidate is the original TF-GridNet DNS checkpoint linked by the ESPnet recipe.
+Its 4-layer / hidden=128 / embedding=32 profile has 2,552,790 parameters and
+362 matching tensor entries; it cannot load into the current 6-layer default.
+No pretrained TF-GridNet inference or quality score has been generated.
+Pretrained loading and native output equivalence are the next integration gate.
+Any subsequent score is an external pretrained baseline, not a controlled
+training comparison. V3 checkpoints remain separate architectural variants.
+
+For a new Windows computer, see `docs/windows_restore.md`. Recording this audit
+needs only Python and Git; model dependencies and audio assets can be restored
+later when actual inference or evaluation is requested.
+
 ## Future plan
 
 1. **Phase 1: Framework setup** — complete.
