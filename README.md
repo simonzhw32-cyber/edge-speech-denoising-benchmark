@@ -20,6 +20,8 @@ Training and validation have separate entry points. They currently execute only
 an explicit synthetic GTCRN fixture, with saved epoch state, validation reports
 and checkpoint selection. Real-data training remains disabled while the protocol
 is a draft. Shared loss, crop/batch and state components are available.
+[Training-data preflight](docs/training_preflight.md) verifies existing local
+train audio and binds the draft speaker split; it does not enable training.
 
 ## Recorded pretrained results
 
@@ -136,5 +138,7 @@ checks through `python -m scripts.smoke_training_components`.
 resume fixture and selection checks through `python -m scripts.smoke_training_state`.
 The [entry-point fixture](docs/training_runner.md) checks train/validate persistence
 and resumed synthetic updates with `python -m scripts.smoke_training_runner`.
+The [data preflight](docs/training_preflight.md) has a synthetic WAV/subset check
+through `python -m scripts.smoke_training_preflight`; it performs no model updates.
 
 Framework reference: [edge-kws-benchmark](https://github.com/kittytinglee/edge-kws-benchmark).

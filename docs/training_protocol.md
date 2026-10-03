@@ -25,8 +25,10 @@ as its parent manifest. Test remains reserved for the final selected checkpoint.
 
 The tool checks metadata counts, source/parquet provenance, row fingerprints,
 sorted unique IDs, sample counts, hash syntax and train-path structure. It does
-not open WAV files or verify the bytes of local audio or parquet. A later trainer
-must use the verified dataset loader and verify the files before learning.
+not open WAV files or verify the bytes of local audio or parquet. The separate
+[training-data preflight](training_preflight.md) now checks every local train WAV
+and binds ordered train/validation views to the canonical plan. Dataset access
+rechecks audio hashes; a preflight report is not permission to start learning.
 The JSON output is a **plan**, not a dataset manifest accepted by the evaluator.
 
 ## Proposed common budget
@@ -97,7 +99,9 @@ settings and their source-config fingerprint are recorded separately.
 Epoch state, independent validation and the selection rule are implemented as
 [reusable components](training_state.md). The
 [entry-point fixture](training_runner.md) connects seeded synthetic updates,
-independent validation and saved selection history. Binding the real training
-data/plan and enabling production entry-point execution remain to be implemented.
+independent validation and saved selection history. The [data preflight and subset adapter](training_preflight.md) bind the real
+train manifest to the proposed split without changing the fixture entry points.
+Enabling production execution, recording hardware conditions and checking crop
+feasibility remain to be implemented.
 Verify that runner on synthetic fixtures before a small hardware feasibility run.
 Only after that should the training protocol be frozen and full training begin.
