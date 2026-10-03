@@ -3,7 +3,8 @@
 Phase 3.1 adds a planning tool, not a trainer. The settings in
 [training_protocol.yaml](../configs/training_protocol.yaml) are proposed shared
 settings, not tuned hyperparameters or a reproduction of the authors' recipes.
-`scripts.train` and `scripts.validate` remain placeholders. The shared waveform
+`scripts.train` and `scripts.validate` now have an explicit
+[synthetic entry-point fixture](training_runner.md); real-data execution remains disabled. The shared waveform
 loss and crop/collator implementation is described in [components](training_components.md).
 Existing pretrained baselines and the fixed test protocol are unchanged.
 
@@ -94,7 +95,9 @@ settings and their source-config fingerprint are recorded separately.
 ## Remaining implementation
 
 Epoch state, independent validation and the selection rule are implemented as
-[reusable components](training_state.md). Seeded training, separate entry-point
-orchestration and persisted selection history remain to be implemented. Verify
-that runner on synthetic fixtures before a small hardware feasibility run.
+[reusable components](training_state.md). The
+[entry-point fixture](training_runner.md) connects seeded synthetic updates,
+independent validation and saved selection history. Binding the real training
+data/plan and enabling production entry-point execution remain to be implemented.
+Verify that runner on synthetic fixtures before a small hardware feasibility run.
 Only after that should the training protocol be frozen and full training begin.

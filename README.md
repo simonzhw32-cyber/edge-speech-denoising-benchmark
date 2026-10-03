@@ -16,10 +16,10 @@ All adapters map mono `[batch, samples]` tensors to the same shape.
 six-layer local profile (8,381,504 parameters); the DNS loader uses the separate
 four-layer `dns_ins20_epoch33` profile (2,552,790 parameters).
 
-Training and validation remain separate configuration-only entry points.
-A shared valid-length waveform loss and paired crop/batch utilities are available;
-epoch-state, independent validation and selection components are also available.
-The optimizer loop and entry-point orchestration are not implemented.
+Training and validation have separate entry points. They currently execute only
+an explicit synthetic GTCRN fixture, with saved epoch state, validation reports
+and checkpoint selection. Real-data training remains disabled while the protocol
+is a draft. Shared loss, crop/batch and state components are available.
 
 ## Recorded pretrained results
 
@@ -134,5 +134,7 @@ The [waveform components](docs/training_components.md) provide loss and batch
 checks through `python -m scripts.smoke_training_components`.
 [State and validation components](docs/training_state.md) add an epoch-boundary
 resume fixture and selection checks through `python -m scripts.smoke_training_state`.
+The [entry-point fixture](docs/training_runner.md) checks train/validate persistence
+and resumed synthetic updates with `python -m scripts.smoke_training_runner`.
 
 Framework reference: [edge-kws-benchmark](https://github.com/kittytinglee/edge-kws-benchmark).

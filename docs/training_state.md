@@ -1,9 +1,10 @@
 # Epoch state and validation components
 
 These components support the [draft training protocol](training_protocol.md).
-They do not enable `scripts.train` or `scripts.validate`: those remain separate
-configuration-only entry points. A trainer, epoch orchestration, persisted
-validation reports and hardware feasibility checks are still needed.
+The separate `scripts.train` and `scripts.validate` commands now exercise a
+[synthetic entry-point fixture](training_runner.md), with persisted reports and
+selection history. Real-data runner wiring and hardware feasibility checks are
+still needed; these components do not freeze the draft protocol.
 
 ## Experiment identity
 
@@ -68,8 +69,8 @@ data; it does not prepare or download it.
 The caller must first restore the named checkpoint and pass its returned hash.
 A report records that hash, epoch, identity, ordered-ID fingerprint, count and
 macro loss. The component cannot independently prove that an arbitrary in-memory
-model came from the supplied hash; the future validation entry point must own
-that loading/report-writing sequence. Model adapters are expected not to modify
+model came from the supplied hash; the fixture validation entry point owns
+that loading/report-writing sequence; a real-data entry point is still needed. Model adapters are expected not to modify
 buffers in eval mode; the component does not snapshot arbitrary forward side effects.
 
 Synthetic datasets require `synthetic=True`; their report scope is
@@ -83,8 +84,9 @@ finite macro loss, with the earliest epoch breaking exact ties. Conflicting
 reports for one epoch are rejected. It returns a copy rather than modifying a
 caller-owned report. It neither deletes files nor tunes against the fixed test.
 
-The future orchestrator must persist complete validation reports, fold them
-through this rule and retain the chosen checkpoint. Saving/loading training state
+The fixture orchestrator persists complete validation reports, folds them
+through this rule and names the retained checkpoint. A future real-data runner
+must preserve the same binding and train-only selection policy. Saving/loading training state
 alone does not persist the selection history. Fixture reports can only be selected
 with the explicit `synthetic=True` flag.
 
