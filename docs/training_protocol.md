@@ -3,7 +3,8 @@
 Phase 3.1 adds a planning tool, not a trainer. The settings in
 [training_protocol.yaml](../configs/training_protocol.yaml) are proposed shared
 settings, not tuned hyperparameters or a reproduction of the authors' recipes.
-`scripts.train`, `scripts.validate` and `EnhancementLoss` remain placeholders.
+`scripts.train` and `scripts.validate` remain placeholders. The shared waveform
+loss and crop/collator implementation is described in [components](training_components.md).
 Existing pretrained baselines and the fixed test protocol are unchanged.
 
 ## Split policy
@@ -44,7 +45,7 @@ The JSON output is a **plan**, not a dataset manifest accepted by the evaluator.
 
 Loss is proposed as negative zero-mean SI-SNR with epsilon `1e-12`, averaged per
 utterance over valid samples. Silent clean references produce an error. This is
-a loss contract only; this stage does not implement it or alter evaluation math.
+implemented in `EnhancementLoss`; evaluation math remains unchanged.
 Future crop/shuffle randomness must be controlled by the training seed and saved
 with resumable optimizer/RNG state. Training and validation stay separate entry
 points; the orchestration layer invokes validation and applies the selection rule.
@@ -92,7 +93,7 @@ settings and their source-config fingerprint are recorded separately.
 
 ## Remaining implementation
 
-Implement the length-aware loss, shared paired crops/batches, seeded training and
-resume state, separate validation and checkpoint-selection orchestration. Verify
-those components on synthetic fixtures before a small hardware feasibility run.
+Implement seeded training and resume state, separate validation and
+checkpoint-selection orchestration on top of the waveform components. Verify
+those additions on synthetic fixtures before a small hardware feasibility run.
 Only after that should the training protocol be frozen and full training begin.

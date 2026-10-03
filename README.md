@@ -16,8 +16,9 @@ All adapters map mono `[batch, samples]` tensors to the same shape.
 six-layer local profile (8,381,504 parameters); the DNS loader uses the separate
 four-layer `dns_ins20_epoch33` profile (2,552,790 parameters).
 
-Training, validation and the shared loss remain placeholders. `scripts.train`
-and `scripts.validate` are separate configuration-only entry points.
+Training and validation remain separate configuration-only entry points.
+A shared valid-length waveform loss and paired crop/batch utilities are available;
+the optimizer loop and validation orchestration are not implemented.
 
 ## Recorded pretrained results
 
@@ -128,5 +129,7 @@ notices live beside each model; [history](docs/history.md) records earlier miles
 
 The [training draft](docs/training_protocol.md) adds a speaker-disjoint split
 planner and synthetic checks. It does not execute training or verify local audio.
+The [waveform components](docs/training_components.md) provide loss and batch
+checks through `python -m scripts.smoke_training_components`.
 
 Framework reference: [edge-kws-benchmark](https://github.com/kittytinglee/edge-kws-benchmark).
