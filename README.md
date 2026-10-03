@@ -38,7 +38,7 @@ cannot be used for tuning or checkpoint selection.
 - **TF-GridNet**: time-frequency modeling based speech enhancement model.
   Original ESPnet variant, with bidirectional LSTMs and global attention; offline.
   Local six-layer random profile plus a separate four-layer DNS pretrained profile.
-  Pretrained loading/inference checks exist; no dataset quality scores yet.
+  Pretrained loading/inference checks passed; full fixed-test evaluation is pending.
 
 All adapters accept and return aligned mono `[batch, samples]` at 16 kHz.
 Native feature processing belongs inside each adapter. `build_model("gtcrn")`
@@ -139,7 +139,8 @@ No checkpoint, optimizer step or dataset quality report is generated.
 Parameters: 8,381,504 total/trainable; 540 network state entries. The local
 profile uses FFT=512/hop=256, six blocks, hidden=192 and embedding=48; it is not a
 published pretrained recipe. `configs/tfgridnet.yaml` records the full profile.
-The evaluation CLI remains restricted to GTCRN in this integration phase.
+The evaluation CLI accepts the distinct DNS pretrained profile in Phase 2.10;
+the six-layer random profile remains excluded from dataset evaluation.
 
 ## TF-GridNet checkpoint audit
 
@@ -150,7 +151,7 @@ Its 4-layer / hidden=128 / embedding=32 profile has 2,552,790 parameters and
 362 matching tensor entries; it cannot load into the current 6-layer default.
 The Phase 2.8 audit is historical. Phase 2.9 adds strict DNS pretrained loading
 and equivalence checks against the pinned ESPnet 202308 release reference.
-No TF-GridNet dataset quality score has been generated.
+No full TF-GridNet VoiceBank report is recorded yet.
 Any subsequent score is an external pretrained baseline, not a controlled
 training comparison. V3 checkpoints remain separate architectural variants.
 
@@ -188,16 +189,41 @@ python -m scripts.inference_tfgridnet --input path/to/noisy.wav --output results
 
 The 16k integration follows the official recipe default; exact training manifests
 remain unavailable. Keep this as an external DNS-pretrained track, separate from
-controlled training. The shared `evaluate(model, dataset)` is available; CLI
-quality evaluation integration follows after local smoke verification.
+controlled training. Phase 2.9 Windows strict loading and release-reference checks passed.
+Phase 2.10 routes this profile through the shared `evaluate(model, dataset)`;
+see the commands below and `docs/tfgridnet_dns_evaluation.md`.
+
+## TF-GridNet DNS unified evaluation (Phase 2.10)
+
+From the repository root, install benchmark extras and recover the fixed test
+split on a new computer. Existing verified DNS weights are reused.
+
+```bash
+python -m pip install -r requirements-benchmark.txt
+python -m scripts.smoke_evaluation_cli
+python -m scripts.prepare_data --split test
+python -m scripts.evaluate --model tfgridnet --profile dns_ins20_epoch33 --metrics stoi si_snr si_snr_improvement --limit 5 --output results/tfgridnet_dns_test5.json
+```
+
+The five-utterance report is a subset check. After it succeeds, remove `--limit 5`
+and use `--output results/tfgridnet_dns_test824.json` for the full fixed split.
+PESQ is explicitly omitted above; after installing its backend, request
+`--metrics pesq stoi si_snr si_snr_improvement` for all quality metrics.
+Full instructions and report-retention steps: `docs/tfgridnet_dns_evaluation.md`.
+
+The same dataset and metric/RTF function serve GTCRN and TF-GridNet. CLI reports
+record the selected profile, pinned checkpoint and implementation fingerprints.
+TF-GridNet DNS is an external pretrained track; it is not a controlled-training
+comparison. Old GTCRN RTF and new-computer RTF must not be ranked together.
+No TF-GridNet VoiceBank quality score is claimed before an actual dataset run.
 
 ## Future plan
 
 1. **Phase 1: Framework setup** — complete.
 2. **Phase 2: Integrate pretrained checkpoints** — all three architectures
    integrated; GTCRN pretrained evaluation complete. TF-GridNet DNS loading and
-   release-reference checks implemented; local verification and quality evaluation
-   follow. LiSenNet pretrained baseline remains pending provenance.
+   release-reference checks verified on Windows; unified evaluation CLI integrated,
+   with dataset quality evaluation pending execution. LiSenNet pretrained baseline remains pending provenance.
 3. **Phase 3: Unified training pipeline** — shared data splits, loss, budget,
    reproducible seeds and selection rule; validation stays separate from train.
 4. **Phase 4: Controlled benchmark comparison** — same fixed test manifest,

@@ -66,8 +66,34 @@ fetch 仅下载固定 DNS checkpoint（约 10.3 MB）并核对哈希；已有正
 
 无需仅因换电脑重跑 GTCRN 824 条评测。恢复 GTCRN 权重时使用
 `python -m scripts.fetch_gtcrn_checkpoint`，不要运行旧源码迁移安装器。
-需要 VoiceBank 时再使用 `scripts.prepare_data` 和 benchmark 依赖；本阶段不需要。
+Phase 2.10 需要 VoiceBank 时按下面步骤准备固定 test；不需要下载 train。
 同一 checkpoint 在不同电脑上的质量/RTF 验证应记录环境，RTF 不混用旧机器报告。
+
+## Phase 2.10 统一评测
+
+Phase 2.9 在 Windows 已通过 strict loading 和参考等价性检查。Phase 2.10
+源码首次迁移起点为已推送的 `5239bde`。若源码已由 Git 恢复，无需再运行安装器。
+否则先下载 phase210_install_tfgridnet_evaluation.py 到 Downloads 并执行：
+
+```bat
+python "%USERPROFILE%\Downloads\phase210_install_tfgridnet_evaluation.py" --repo "%CD%"
+```
+
+在仓库根目录逐条执行：
+
+```bat
+python -m pip install -r requirements-benchmark.txt --index-url https://pypi.org/simple
+python -m scripts.smoke_benchmark
+python -m scripts.smoke_evaluation_cli
+python -m scripts.prepare_data --split test
+python -m scripts.evaluate --model tfgridnet --profile dns_ins20_epoch33 --metrics stoi si_snr si_snr_improvement --limit 5 --output results/tfgridnet_dns_test5.json
+```
+
+只下载约 132 MB 的固定 test parquet，检查哈希并准备 824 对音频。
+5 条成功后，去掉 `--limit 5` 并使用 `--output results/tfgridnet_dns_test824.json`。
+这三项指标明确缺少 PESQ；PESQ 安装、完整指标命令与结果保存见
+`docs/tfgridnet_dns_evaluation.md`。不改模型配置，不训练，不用 test 选权重。
+旧 GTCRN 报告由另一台电脑产生，不能直接比较两次 RTF。
 
 ## 下次继续时保留
 

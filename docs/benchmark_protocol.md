@@ -66,3 +66,22 @@ resolve URL and use --parquet PATH with prepare_data; SHA-256 is still enforced.
 Data/manifests remain under ignored data/ and report files under ignored results/.
 GTCRN results are upstream-pretrained results using the VCTK-DEMAND checkpoint;
 they do not represent a controlled comparison with the other two models.
+
+## TF-GridNet DNS extension — Phase 2.10
+
+The same dataset, metrics and timing protocol now serve the explicit
+`--model tfgridnet --profile dns_ins20_epoch33` track. Its strict loader uses
+only the audited four-block DNS checkpoint; the six-block registry default
+and random weights cannot enter CLI evaluation. GTCRN CLI defaults are retained.
+LiSenNet is still excluded pending an accepted pretrained checkpoint.
+
+Commands, PESQ coverage and report retention: `docs/tfgridnet_dns_evaluation.md`.
+Reports add profile, checkpoint provenance, source fingerprints and Git context.
+Five-utterance checks stay `subset_or_fixture`; only the verified full fixed
+824-utterance split can be `full_fixed_test`. Missing metrics remain explicit.
+
+These are external pretrained comparisons with different training provenance,
+not a controlled training experiment. Exact DNS training manifests are absent.
+RTF comparisons require rerunning both models on the same machine and software
+with identical timing conditions; previous-machine GTCRN RTF cannot be ranked
+against new-machine TF-GridNet RTF. No training or model selection uses test.
