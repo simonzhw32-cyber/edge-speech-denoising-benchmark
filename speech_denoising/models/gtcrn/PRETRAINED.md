@@ -14,15 +14,15 @@ state entries must match. Counts include 48245 total parameters, with frozen
 ERB parameters separately excluded from trainable parameter count.
 Source/license attribution remains in SOURCE.md and LICENSE.upstream.
 
-The installer includes the unmodified checkpoint and one upstream noisy demo
-(test_wavs/mix.wav) to avoid requiring GitHub downloads at install time.
+The original migration installer bundled the checkpoint and one upstream noisy
+demo (`test_wavs/mix.wav`). Current checkouts use the fetcher below to restore them.
 Demo SHA-256: 8d47e1d03eeb457c2549be79c8ec33a349ccd79f21c3add05f946f8f760c5a99
 Demo git blob SHA-1: bab7cfd86b80c50533281f980e2f0343b5262223
 It is 156302 samples of mono 16 kHz PCM16 audio. It is a listening demo,
 not an utterance selected from this benchmark's fixed 824-item test manifest.
 It has no clean reference here, so no reference-based quality scores are given.
 Weights and demo/output audio stay in ignored checkpoints/ and results/.
-Do not commit them. The installer checks git check-ignore before writing them.
+They are not tracked by Git.
 
 Commands:
 
@@ -34,12 +34,12 @@ For personal mono 16 kHz PCM16 WAV:
 
     python -m scripts.inference --input YOUR_AUDIO.wav --output results/enhanced.wav
 
-To reproduce the asset downloads without the installer:
+To restore the checkpoint and optional demo:
 
     python -m scripts.fetch_gtcrn_checkpoint --demo
 
 The output timing is a single cold CPU run, not a controlled RTF comparison.
 Whole-utterance centered-STFT inference does not claim stateful streaming.
-This is an upstream-pretrained demonstration, not unified-training benchmark
-results. All models still need the same pinned VoiceBank-DEMAND-16k manifest,
-metric runner and controlled measurement protocol before comparison.
+Single-WAV inference is a listening demonstration. The committed full VoiceBank
+evaluation is indexed in [results](../../../docs/results.md); training conditions
+remain unmatched across pretrained checkpoints.

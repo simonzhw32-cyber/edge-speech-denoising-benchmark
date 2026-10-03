@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "edge-speech-denoising-benchmark"
 version = "0.1.0"
-description = "Unified edge speech denoising benchmark skeleton"
+description = "Shared speech denoising models and reproducible VoiceBank evaluation"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = ["torch>=2.1", "numpy>=1.24", "soundfile>=0.12", "PyYAML>=6.0"]

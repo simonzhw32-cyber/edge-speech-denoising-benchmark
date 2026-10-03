@@ -38,12 +38,13 @@ def load_config(path, _seen=None):
 
 
 def phase1_entrypoint(task):
+    """Load the original scaffold config without running a pipeline."""
     import argparse
 
-    parser = argparse.ArgumentParser(description=f"{task}: Phase 1 interface only")
+    parser = argparse.ArgumentParser(description=f"{task}: configuration-only placeholder")
     parser.add_argument("--config", default="configs/default.yaml")
     args = parser.parse_args()
     config = load_config(args.config)
     if config.get("phase") != 1:
-        parser.error("Only Phase 1 is implemented.")
-    print(f"{task}: configuration loaded; implementation pending. No work executed.")
+        parser.error("This placeholder accepts only scaffold configs with phase: 1.")
+    print(f"{task}: configuration loaded; pipeline not implemented.")

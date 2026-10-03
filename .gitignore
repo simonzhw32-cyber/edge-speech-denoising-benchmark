@@ -8,8 +8,9 @@ dist/
 .pytest_cache/
 .env
 .env.*
-data/
-datasets/
+# Local datasets and generated audio/weights.
+/data/
+/datasets/
 *.wav
 *.flac
 *.pt
@@ -20,15 +21,3 @@ datasets/
 /results/*
 !/results/.gitkeep
 .DS_Store
-
-# Track dataset Python source
-!speech_denoising/datasets/
-!speech_denoising/datasets/*.py
-
-# Track dataset Python source
-!speech_denoising/datasets/
-!speech_denoising/datasets/*.py
-
-# Track dataset Python source
-!speech_denoising/datasets/
-!speech_denoising/datasets/*.py

@@ -1,4 +1,4 @@
-# torch/numpy are already installed for the GTCRN adapter.
+# Install the base package first; these dependencies support data and metrics.
 soundfile>=0.12
 pyarrow>=14
 pystoi>=0.4

@@ -111,7 +111,7 @@ for `stft(return_complex=False)` comes from the historical reference path.
 
 ## Windows commands
 
-After the Phase 2.9 source installer, from the repo root:
+From a current checkout, run these commands at the repository root:
 
 ```bat
 python -m pip install torch==2.14.1 --index-url https://pypi.org/simple
@@ -123,8 +123,8 @@ python -m scripts.smoke_tfgridnet
 
 The first installation command selects the standard Windows wheel rather than
 depending on the CPU index that previously failed certificate verification.
-Run this integration on CPU regardless of GPU availability. Windows inference
-must be verified locally; Linux validation is not a Windows-pass claim.
+Run this integration on CPU regardless of GPU availability. Recorded Windows integration checks are stored in
+`benchmark_reports/tfgridnet_dns_pretrained_check_windows.json`.
 
 For an actual input WAV, optionally run:
 
@@ -137,10 +137,12 @@ WAV I/O, records sample alignment and clipping count, and produces no quality
 scores. It does not download audio. WAV quantization/clipping occurs only during
 export, not inside the float waveform model used by the shared evaluator.
 
-`scripts.evaluate` stays unchanged and restricted to GTCRN in this phase.
-Any later TF-GridNet quality evaluation must use the common
-`evaluate(model, dataset)` metrics, the fixed 824-test manifest and explicit
-checkpoint/profile metadata. No synthetic check is a dataset benchmark.
+`scripts.evaluate --model tfgridnet --profile dns_ins20_epoch33` now uses the
+common `evaluate(model, dataset)` with the fixed test manifest and explicit
+checkpoint metadata. The completed 824-item quality report is indexed in
+[results](../../../docs/results.md); commands are in the
+[evaluation guide](../../../docs/tfgridnet_dns_evaluation.md). Synthetic smoke
+checks remain separate from dataset evaluation.
 
 ## Primary sources
 

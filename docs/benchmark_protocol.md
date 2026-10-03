@@ -1,87 +1,75 @@
-# Unified VoiceBank-DEMAND-16k evaluation — Phase 2.4
+# Benchmark protocol
 
-Dataset source: https://huggingface.co/datasets/JacobLinCool/VoiceBank-DEMAND-16k
-Revision: 20879f4f9aab3d0b9263993667e7711a3ae1416d
-Dataset card: cc-by-4.0; 11572 train, 824 test; id/clean/noisy at 16 kHz.
-configs/voicebank.json pins all six parquet file sizes and SHA-256 hashes.
-The test shard is 132200447 bytes (about 132 MB); train shards total about
-2.15 GB. The initial preparation command downloads only the full test shard.
-Training is not performed. Validation must later be derived reproducibly from
-train; the official test is never used for selection/tuning.
+## Dataset and split
 
-Preparation validates parquet SHA-256, unique IDs, filename pairing, mono
-16 kHz audio, finite samples and equal clean/noisy lengths. Audio bytes are
-preserved. Sorted manifest rows have a stable SHA-256; every audio file has its
-own hash. The loader verifies these on access and forbids paths outside the
-manifest root. Full manifests require the protocol count; fixtures require an
-explicit opt-out and cannot produce a full benchmark report.
+Source: [JacobLinCool/VoiceBank-DEMAND-16k](https://huggingface.co/datasets/JacobLinCool/VoiceBank-DEMAND-16k),
+revision `20879f4f9aab3d0b9263993667e7711a3ae1416d`.
+The source card declares CC-BY-4.0. There are 11,572 train and 824 fixed test
+utterances at 16 kHz. [configs/voicebank.json](../configs/voicebank.json) pins
+all six parquet file sizes and SHA-256 hashes. The test shard is 132,200,447
+bytes; training shards total about 2.15 GB.
 
-Quality metrics use aligned complete utterances with no independent gain
-normalization, clipping, truncation, resampling or silence trimming:
-- PESQ: pesq 16 kHz wideband MOS-LQO.
-- STOI: pystoi classical STOI, extended=False.
-- SI-SNR: remove signal means, project estimate onto clean reference, then
-  10*log10((projected energy + 1e-12)/(residual energy + 1e-12)). A silent
-  clean reference is undefined and yields an explicit metric error.
-- SI-SNR improvement: enhanced SI-SNR minus noisy SI-SNR.
-Each quality mean is a per-utterance macro mean. Noisy baseline scores use the
-same implementation. Errors have null scores and named failures, and coverage
-is recorded; a report with failures is not accepted as complete. Missing
-backends stop evaluation before inference unless those metrics were explicitly
-omitted. Omitted metrics are recorded in not_computed and all_quality_metrics_complete=False.
+Preparation checks parquet hashes, unique IDs, filenames, finite mono 16 kHz
+signals and equal clean/noisy lengths. Original audio bytes are preserved.
+Sorted manifest rows and individual files have hashes; the loader verifies them
+and rejects paths outside the manifest root. Full manifests must match the
+pinned source and split count. Future validation comes from train; test is never
+used for tuning or checkpoint selection.
 
-RTF is sum of per-utterance median inference time / total audio duration.
-Default: CPU, FP32, batch=1, one thread, one warmup per utterance, three timed
-runs per utterance. STFT/network/iSTFT are included; file decoding, host/device
-transfer and metric calculation are excluded. CUDA timing synchronizes if a
-CUDA model is supplied to evaluate(). Platform, precision, threads, warmups,
-repeats and package versions are stored. Whole-utterance centered-STFT RTF is
-not streaming latency. Parameter count includes frozen ERB parameters; the
-trainable count is reported separately.
+## Quality metrics
 
-## Windows first run
+Aligned complete utterances are scored without independent gain normalization,
+clipping, resampling, silence trimming or score-dependent truncation.
 
-    python -m pip install -r requirements-benchmark.txt --index-url https://pypi.org/simple
-    python -m scripts.smoke_benchmark
-    python -m scripts.prepare_data --split test
-    python -m scripts.evaluate --metrics stoi si_snr si_snr_improvement --limit 5 --output results/gtcrn_test5.json
+| Metric | Definition |
+|---|---|
+| PESQ | `pesq`, 16 kHz wideband MOS-LQO |
+| STOI | Classical `pystoi`, `extended=False` |
+| SI-SNR | Zero-mean projection onto the clean reference, in dB |
+| SI-SNR improvement | Enhanced SI-SNR minus noisy SI-SNR |
 
-The five-utterance run is a wiring check and is labeled subset_or_fixture.
-For a full 824-utterance report with the available metrics:
+SI-SNR uses `10*log10((projected_energy + 1e-12)/(residual_energy + 1e-12))`.
+A silent clean reference is undefined and produces an explicit error. Quality
+means are per-utterance macro means. The noisy baseline uses the same functions.
+Errors retain null scores and named failures, with coverage reported separately.
+Data/integrity errors abort rather than dropping utterances.
 
-    python -m scripts.evaluate --metrics stoi si_snr si_snr_improvement
+Missing requested backends stop evaluation. Explicitly omitted metrics appear
+in `not_computed`; nothing is substituted for PESQ. A report that processes all
+824 utterances but omits PESQ still has partial quality coverage.
 
-PESQ backend source: https://github.com/ludlows/PESQ (requires a C compiler,
-NumPy and Cython). On Windows, installing pesq may require Microsoft C++ Build
-Tools. Use the documented pesq installation for your platform; once installed:
+## Runtime and parameters
 
-    python -m scripts.evaluate
+Default timing is CPU FP32, batch=1, one thread, one warmup and three timed
+runs per utterance. RTF is the sum of per-utterance median inference seconds
+divided by total audio duration. Adapter STFT/network/iSTFT are included;
+file decoding, transfers and metric calculation are excluded. CUDA timing
+synchronizes when a CUDA model is supplied to the programmatic evaluator.
 
-No different metric is substituted for PESQ. A report omitting PESQ is explicitly
-partial in metric coverage even when all 824 utterances were processed.
-STOI backend: https://github.com/mpariente/pystoi
+Reports record platform, device, precision, threads, repeats and package versions.
+Compare runtime only under matched hardware, software and measurement conditions.
+Whole-utterance centered-STFT timing does not measure streaming latency.
+Parameter count includes all parameters, including GTCRN's frozen ERB parameters;
+trainable parameters are counted separately.
 
-For download problems, manually obtain the pinned test parquet from the source
-resolve URL and use --parquet PATH with prepare_data; SHA-256 is still enforced.
-Data/manifests remain under ignored data/ and report files under ignored results/.
-GTCRN results are upstream-pretrained results using the VCTK-DEMAND checkpoint;
-they do not represent a controlled comparison with the other two models.
+## Profiles and report scope
 
-## TF-GridNet DNS extension — Phase 2.10
+`scripts.evaluate` strictly loads GTCRN VCTK-DEMAND or the explicit TF-GridNet
+`dns_ins20_epoch33` profile, then calls the same `evaluate(model, dataset)`.
+TF-GridNet's six-layer random default is not selected by this CLI branch.
+LiSenNet is held back pending accepted checkpoint provenance.
 
-The same dataset, metrics and timing protocol now serve the explicit
-`--model tfgridnet --profile dns_ins20_epoch33` track. Its strict loader uses
-only the audited four-block DNS checkpoint; the six-block registry default
-and random weights cannot enter CLI evaluation. GTCRN CLI defaults are retained.
-LiSenNet is still excluded pending an accepted pretrained checkpoint.
+Five-item checks and synthetic fixtures are labeled `subset_or_fixture`.
+Only the complete verified test split is `full_fixed_test`. Full quality coverage
+also requires all four quality metrics, zero failures and 824 valid scores per
+metric. Reports retain per-utterance records, dataset/checkpoint provenance and
+measurement conditions; newer CLI reports also record source fingerprints and
+Git context.
 
-Commands, PESQ coverage and report retention: `docs/tfgridnet_dns_evaluation.md`.
-Reports add profile, checkpoint provenance, source fingerprints and Git context.
-Five-utterance checks stay `subset_or_fixture`; only the verified full fixed
-824-utterance split can be `full_fixed_test`. Missing metrics remain explicit.
+The recorded scores are external pretrained baselines with different training
+provenance. Exact DNS training manifests are unavailable, so these results do
+not establish a controlled training comparison.
 
-These are external pretrained comparisons with different training provenance,
-not a controlled training experiment. Exact DNS training manifests are absent.
-RTF comparisons require rerunning both models on the same machine and software
-with identical timing conditions; previous-machine GTCRN RTF cannot be ranked
-against new-machine TF-GridNet RTF. No training or model selection uses test.
+Commands: [README](../README.md), [Windows setup](windows_restore.md) and
+[DNS evaluation](tfgridnet_dns_evaluation.md). Existing records are indexed in
+[results](results.md).

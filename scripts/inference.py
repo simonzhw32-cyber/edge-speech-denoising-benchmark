@@ -19,7 +19,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 def read_audio(path):
     with wave.open(str(path), "rb") as handle:
         if (handle.getnchannels(), handle.getsampwidth(), handle.getframerate(), handle.getcomptype()) != (1, 2, 16000, "NONE"):
-            raise ValueError("This first inference entry point requires mono 16 kHz PCM16 WAV.")
+            raise ValueError("Expected mono 16 kHz PCM16 WAV.")
         frames = handle.getnframes()
         samples = np.frombuffer(handle.readframes(frames), dtype="<i2").astype(np.float32) / 32768.0
     if frames == 0 or samples.size != frames:
@@ -81,7 +81,6 @@ def main():
     print("Input/output samples:", noisy.shape[-1], enhanced.shape[-1])
     print("Enhanced WAV:", args.output)
     print("Metadata:", metadata_path)
-    print("No training or dataset benchmark performed.")
 
 
 if __name__ == "__main__":

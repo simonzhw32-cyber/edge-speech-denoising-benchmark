@@ -56,7 +56,6 @@ def main():
     print("Input/output samples:", noisy.shape[-1], enhanced.shape[-1])
     print("Enhanced WAV:", args.output)
     print("Metadata:", metadata_path)
-    print("No training or dataset quality evaluation performed.")
 
 
 if __name__ == "__main__":

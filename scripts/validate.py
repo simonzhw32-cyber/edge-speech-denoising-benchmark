@@ -1,4 +1,4 @@
-"""Separate validate entry point; Phase 1 does not execute this pipeline."""
+"""Validation placeholder; currently loads configuration only."""
 
 from speech_denoising.utils.utils import phase1_entrypoint
 
