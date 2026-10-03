@@ -1,0 +1,28 @@
+# Distinct external pretrained profile; configs/tfgridnet.yaml is unchanged.
+model: tfgridnet
+profile: dns_ins20_epoch33
+sample_rate: 16000
+model_params:
+  n_fft: 512
+  stride: 256
+  n_layers: 4
+  lstm_hidden_units: 128
+  attn_n_head: 4
+  attn_approx_qk_dim: 512
+  emb_dim: 32
+  emb_ks: 4
+  emb_hs: 4
+  activation: prelu
+  eps: 0.00001
+protocol:
+  variant: espnet_original_tfgridnet
+  input_channels: 1
+  output_sources: 1
+  window: hann
+  mode: offline_whole_utterance
+  weights: dns_ins20_epoch33
+  checkpoint: checkpoints/tfgridnet_dns_epoch33.pth
+  normalize_output_wav: false
+  comparison_type: external_pretrained
+  training_data: DNS_Challenge_2020_synthetic
+  sample_rate_note: recipe_16k_default_exact_training_manifests_unavailable

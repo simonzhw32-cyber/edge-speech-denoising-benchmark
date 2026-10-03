@@ -1,0 +1,5 @@
+# PyTorch must be installed separately (CPU or the appropriate CUDA build).
+numpy>=1.26
+# Small legacy-complex dependency needed only for the pinned upstream reference.
+torch-complex==0.4.4
+packaging>=24

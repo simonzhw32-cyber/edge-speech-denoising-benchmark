@@ -1,0 +1,75 @@
+{
+  "scope": "pretrained_integration_check_synthetic_waveforms",
+  "checkpoint": {
+    "model_id": "Zhaoheng/tfgridnet_dns_ins20_epoch33",
+    "profile": "dns_ins20_epoch33",
+    "source_revision": "667c73df547006f47513f2b31c1709bdac63f79c",
+    "source_url": "https://huggingface.co/Zhaoheng/tfgridnet_dns_ins20_epoch33/resolve/667c73df547006f47513f2b31c1709bdac63f79c/exp/enh_train_enh_tfgrid_raw/33epoch.pth",
+    "sha256": "613db9fb4dafa7860d9e1390ec8f6bb61bba62cc0a67482bebcfbd0221d865c3",
+    "matched_state_entries": 362,
+    "parameter_count": 2552790,
+    "trainable_parameter_count": 2552790,
+    "training_dataset": "DNS Challenge 2020 synthetic recipe; external pretrained",
+    "epoch_from_filename": 33,
+    "license_card_declaration": "bsd-2-clause",
+    "sample_rate": 16000,
+    "sample_rate_basis": "Official recipe defaults to 16k; exact training audio manifests unavailable.",
+    "mode": "offline_whole_utterance",
+    "normalize_output_wav": false,
+    "comparison_type": "external_pretrained; not controlled unified training",
+    "audit_record": "docs/tfgridnet_checkpoint_audit.json"
+  },
+  "reference_version": "ESPnet v.202308",
+  "reference_revision": "01d7df74f711758edab1d90b24e2f0859e0b31da",
+  "reference_limit": "Version-matched public release; reported training commit could not be publicly retrieved.",
+  "reference_complex_path": "legacy torch_complex; published separator default",
+  "equivalence_cases": [
+    {
+      "batch": 1,
+      "samples": 768,
+      "max_abs_difference": 0.0
+    },
+    {
+      "batch": 1,
+      "samples": 1025,
+      "max_abs_difference": 0.0
+    },
+    {
+      "batch": 1,
+      "samples": 16000,
+      "max_abs_difference": 0.0
+    },
+    {
+      "batch": 1,
+      "samples": 16001,
+      "max_abs_difference": 0.0
+    },
+    {
+      "batch": 2,
+      "samples": 1025,
+      "max_abs_difference": 0.0
+    }
+  ],
+  "rtol": 1e-05,
+  "atol": 1e-06,
+  "checks": [
+    "checksum",
+    "strict_state",
+    "finite_tensors",
+    "release_reference_equivalence",
+    "batch_independence",
+    "gain",
+    "short_padding_alignment",
+    "silence",
+    "load_rejections"
+  ],
+  "device": "cpu",
+  "precision": "float32",
+  "threads": 1,
+  "torch_version": "2.14.1+cpu",
+  "python_version": "3.13.16",
+  "platform": "Windows-11-10.0.22631-SP0",
+  "training_performed": false,
+  "quality_scores_generated": false,
+  "dataset_utterances_evaluated": 0
+}

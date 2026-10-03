@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "phase": "2.9",
+  "base_commit": "0e74ad0",
+  "model_id": "Zhaoheng/tfgridnet_dns_ins20_epoch33",
+  "checkpoint_revision": "667c73df547006f47513f2b31c1709bdac63f79c",
+  "checkpoint_sha256": "613db9fb4dafa7860d9e1390ec8f6bb61bba62cc0a67482bebcfbd0221d865c3",
+  "checkpoint_bytes": 10332558,
+  "checkpoint_state_entries": 362,
+  "parameter_count": 2552790,
+  "profile": "dns_ins20_epoch33",
+  "config_file": "configs/tfgridnet_dns.yaml",
+  "sample_rate": 16000,
+  "sample_rate_limit": "Recipe default; exact training audio manifests not publicly available.",
+  "reference_tag": "v.202308",
+  "reference_revision": "01d7df74f711758edab1d90b24e2f0859e0b31da",
+  "reported_training_commit": "60ce18efa06ca5a5922534682f47e2107ef88b13",
+  "reported_training_commit_retrieved": false,
+  "reference_scope": "Version-matched release with legacy real/imag -> builtin complex bridge only at iSTFT boundary; not exact training-checkout reproduction.",
+  "reference_sources": [
+    {
+      "path": "espnet2/enh/separator/tfgridnet_separator.py",
+      "url": "https://raw.githubusercontent.com/espnet/espnet/01d7df74f711758edab1d90b24e2f0859e0b31da/espnet2/enh/separator/tfgridnet_separator.py",
+      "bytes": 14294,
+      "sha256": "4e0fe975116a1dc12904111588e4f8f5ae779e91ec6945d99756ddac2ec72f52"
+    },
+    {
+      "path": "espnet2/enh/encoder/stft_encoder.py",
+      "url": "https://raw.githubusercontent.com/espnet/espnet/01d7df74f711758edab1d90b24e2f0859e0b31da/espnet2/enh/encoder/stft_encoder.py",
+      "bytes": 4672,
+      "sha256": "330d9ab2988f55806915adc4ec66efb8b077b6c416c4d2b873cdfdc79d9070dd"
+    },
+    {
+      "path": "espnet2/enh/decoder/stft_decoder.py",
+      "url": "https://raw.githubusercontent.com/espnet/espnet/01d7df74f711758edab1d90b24e2f0859e0b31da/espnet2/enh/decoder/stft_decoder.py",
+      "bytes": 6263,
+      "sha256": "478e625239330b2ba07cd8640f26252aecadc476c355b347c708b8cf1c014772"
+    },
+    {
+      "path": "espnet2/layers/stft.py",
+      "url": "https://raw.githubusercontent.com/espnet/espnet/01d7df74f711758edab1d90b24e2f0859e0b31da/espnet2/layers/stft.py",
+      "bytes": 8787,
+      "sha256": "cbde9989cdb0ebf6c8cc78fdae466879d35b95f6e48637ca072377e460ceb426"
+    },
+    {
+      "path": "espnet2/torch_utils/get_layer_from_string.py",
+      "url": "https://raw.githubusercontent.com/espnet/espnet/01d7df74f711758edab1d90b24e2f0859e0b31da/espnet2/torch_utils/get_layer_from_string.py",
+      "bytes": 1411,
+      "sha256": "f8821d9566f326f75e69339eca18fa3b84d81b84915502dddbfe64b30dc0884e"
+    },
+    {
+      "path": "espnet2/enh/espnet_model.py",
+      "url": "https://raw.githubusercontent.com/espnet/espnet/01d7df74f711758edab1d90b24e2f0859e0b31da/espnet2/enh/espnet_model.py",
+      "bytes": 21569,
+      "sha256": "93d80dfb7f1f02794f79dd0f540e43a165e9f603d809ee0f85ba0cd1489c2d0e"
+    },
+    {
+      "path": "espnet2/bin/enh_inference.py",
+      "url": "https://raw.githubusercontent.com/espnet/espnet/01d7df74f711758edab1d90b24e2f0859e0b31da/espnet2/bin/enh_inference.py",
+      "bytes": 21910,
+      "sha256": "49bbd1f697530397af65d21d7fb9e52ef8a640d9112142cf23a1bc3dd45835f3"
+    },
+    {
+      "path": "espnet2/tasks/enh.py",
+      "url": "https://raw.githubusercontent.com/espnet/espnet/01d7df74f711758edab1d90b24e2f0859e0b31da/espnet2/tasks/enh.py",
+      "bytes": 18429,
+      "sha256": "695a52027a7f9653492a459b8e8c5d4223a40fd0438f3945e01c29407b22d0b3"
+    },
+    {
+      "path": "espnet2/enh/layers/complex_utils.py",
+      "url": "https://raw.githubusercontent.com/espnet/espnet/01d7df74f711758edab1d90b24e2f0859e0b31da/espnet2/enh/layers/complex_utils.py",
+      "bytes": 6751,
+      "sha256": "95b27b87a07849f00b7b254c43acd009dd14125f96cd8a08bec2bdf3f5e26663"
+    },
+    {
+      "path": "LICENSE",
+      "url": "https://raw.githubusercontent.com/espnet/espnet/01d7df74f711758edab1d90b24e2f0859e0b31da/LICENSE",
+      "bytes": 11372,
+      "sha256": "4696c3c9551da6fef1368be1e4ed2c80cf13e55448c6dcf2aba9462f5ff29ef5"
+    }
+  ],
+  "smoke_command": "python -m scripts.smoke_tfgridnet_pretrained",
+  "smoke_report": "results/tfgridnet_dns_pretrained_check.json",
+  "quality_scores_generated": false,
+  "training_performed": false,
+  "comparison_type": "external_pretrained; not controlled unified training",
+  "network_defaults_changed": false,
+  "evaluation_cli_changed": false
+}
