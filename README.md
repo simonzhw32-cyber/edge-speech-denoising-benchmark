@@ -127,7 +127,7 @@ Synthetic checks are separate from dataset quality evaluation.
 
 Next work is a unified training pipeline with a reproducible train/validation
 split, loss, budget, seeds and checkpoint-selection rule, followed by a controlled
-comparison. Keep the repository private. Source revisions and original license
+comparison. Source revisions and original license
 notices live beside each model; [history](docs/history.md) records earlier milestones.
 
 The [training draft](docs/training_protocol.md) adds a speaker-disjoint split
@@ -145,3 +145,6 @@ batch and one full validation utterance on an explicit device, without optimizer
 steps. A passing probe does not yet enable real-data training.
 
 Framework reference: [edge-kws-benchmark](https://github.com/kittytinglee/edge-kws-benchmark).
+
+See [requirements and acceptance status](docs/project_requirements.md) for the
+remaining work, dependency roles and the next real-training milestone.

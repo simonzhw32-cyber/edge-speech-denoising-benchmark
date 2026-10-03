@@ -27,7 +27,19 @@ source. Old installers check old source fingerprints and may reject later
 versions. Use the current fetchers and [Windows setup](windows_restore.md)
 when restoring a computer.
 
-Training, validation and loss remain unimplemented. The YAML scaffold still uses
-`phase: 1` for its configuration-only entry points; the TF-GridNet YAML files
-record architectural profiles instead. Unifying training configuration belongs
-to the next implementation stage.
+Subsequent work implements a draft training protocol, speaker split, length-aware
+SI-SNR loss, paired waveform batching, epoch state restoration, independent
+validation components and a synthetic GTCRN runner. Real train-data preflight
+and bounded resource probes are also available. Real-data training is still
+unavailable through the current CLI; no selected real-data checkpoint exists.
+
+| Stage | Outcome | Evidence |
+|---|---|---|
+| Training components (3.1–3.3) | Planning, loss/batching, state restoration and validation selection | `docs/training_protocol.md`, `docs/training_components.md`, `docs/training_state.md` |
+| Synthetic runner (3.4) | Separate train/validate CLI and epoch-boundary resume fixture | `docs/training_runner.md` |
+| Train data (3.5) | Complete local audio preflight and plan-bound dataset views | `docs/training_preflight.md`, archived `gtcrn_audio.json` |
+| Resource probes (3.6) | GTCRN/LiSenNet bounded checks passed; capped TF-GridNet checks failed with OOM | `docs/training_probe.md`, `training_reports/phase36_windows/` |
+| Memory trace | Batch-one TF-GridNet failure located in second block inter-RNN during forward | `b8aee8e`, archived trace JSON and launcher |
+
+[Requirements and acceptance status](project_requirements.md) separates this
+implementation progress from completed research experiments.
