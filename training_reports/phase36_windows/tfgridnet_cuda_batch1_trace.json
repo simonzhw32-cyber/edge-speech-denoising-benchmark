@@ -1,0 +1,1215 @@
+{
+  "schema_version": 1,
+  "scope": "bounded_training_resource_probe",
+  "result": {
+    "status": "out_of_memory",
+    "stages": {
+      "train_batch": {
+        "status": "out_of_memory",
+        "input_shape": [
+          1,
+          64000
+        ],
+        "valid_lengths": [
+          36480
+        ],
+        "backward": true,
+        "baseline_allocated_bytes": 33702912,
+        "error": "CUDA out of memory. Tried to allocate 1.44 GiB. GPU 0 has a total capacity of 7.96 GiB of which 3.15 GiB is free. Process 2040 has 17179869184.00 GiB memory in use. Process 5808 has 17179869184.00 GiB memory in use. Process 4916 has 17179869184.00 GiB memory in use. Process 5816 has 17179869184.00 GiB memory in use. Process 4768 has 17179869184.00 GiB memory in use. Process 4468 has 17179869184.00 GiB memory in use. Process 12304 has 17179869184.00 GiB memory in use. Process 16324 has 17179869184.00 GiB memory in use. Process 21500 has 17179869184.00 GiB memory in use. Process 23640 has 17179869184.00 GiB memory in use. Process 2820 has 17179869184.00 GiB memory in use. Process 1132 has 17179869184.00 GiB memory in use. Process 25724 has 17179869184.00 GiB memory in use. Process 22240 has 17179869184.00 GiB memory in use. Process 16012 has 17179869184.00 GiB memory in use. Process 38576 has 17179869184.00 GiB memory in use. Process 38996 has 17179869184.00 GiB memory in use. Process 41844 has 17179869184.00 GiB memory in use. Process 39636 has 17179869184.00 GiB memory in use. Process 38596 has 17179869184.00 GiB memory in use. Including non-PyTorch memory, this process has 17179869184.00 GiB memory in use. 3.98 GiB allowed; Of the allocated memory 2.34 GiB is allocated by PyTorch, and 1.33 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)",
+        "seconds": 0.872675699996762,
+        "peak_allocated_bytes": 3870085120,
+        "peak_reserved_bytes": 3940548608
+      }
+    },
+    "optimizer_steps": 0,
+    "parameters_unchanged": true,
+    "buffers_restored": true
+  },
+  "model": "tfgridnet",
+  "model_settings": {
+    "config": "configs/tfgridnet.yaml",
+    "profile": "local_6layer",
+    "initialization": "random",
+    "constructor_kwargs": {
+      "n_fft": 512,
+      "stride": 256,
+      "n_layers": 6,
+      "lstm_hidden_units": 192,
+      "attn_n_head": 4,
+      "attn_approx_qk_dim": 512,
+      "emb_dim": 48,
+      "emb_ks": 4,
+      "emb_hs": 1,
+      "activation": "prelu",
+      "eps": 1e-05
+    },
+    "config_sha256": "4332b61571dbdd0260a75d205bc5e8593020cb17b6d1d371bd9a325dac001a93"
+  },
+  "parameters": {
+    "all": 8381504,
+    "trainable": 8381504
+  },
+  "plan_sha256": "7582110b29dc050a52c56f1dda4d2b9d8d6abb02d6a1bd15b65107f95de35b7e",
+  "protocol_sha256": "4a7242c5363d4a342c7cc96edc65f764bb0106f6e2a4f62c158e8dd5e5ff7305",
+  "split_sha256": "0a1ebb0028dfa7d4a5c7971636e54a7a14576d13d8a0760537e1668361f5d220",
+  "manifest_sha256": "5f3d34bedafe1782c532c5f40851e322997c7bfa23694dba29fed570f379f6ef",
+  "preflight_sha256": "dc24d0097da2181ab1eab2cabbf2a297cb882f71f4595148c6e2811eb3caabf5",
+  "selection": {
+    "train_ids": [
+      "p226_001"
+    ],
+    "validation_id": "p256_023",
+    "validation_samples": 185760,
+    "segment_samples": 64000,
+    "seed": 42,
+    "epoch": 1,
+    "diagnostic_batch_size": 1,
+    "draft_batch_size": 4,
+    "crop_starts": [
+      0
+    ],
+    "valid_lengths": [
+      36480
+    ]
+  },
+  "runtime": {
+    "python": "3.13.16",
+    "torch": "2.14.1+cu130",
+    "numpy": "2.5.3",
+    "cuda_build": "13.0",
+    "device": "cuda:0",
+    "platform": "Windows-11-10.0.22631-SP0",
+    "cpu_threads": 4,
+    "interop_threads": 1,
+    "autocast": false,
+    "tensor_dtype": "float32",
+    "matmul_tf32": false,
+    "cudnn_tf32": true,
+    "cudnn_benchmark": false,
+    "deterministic_algorithms": false,
+    "gpu": "NVIDIA GeForce RTX 5060",
+    "compute_capability": [
+      12,
+      0
+    ],
+    "gpu_total_bytes": 8546484224,
+    "gpu_free_bytes_before_model": 7359954944,
+    "resource_limits": {
+      "cuda_allocator": "native",
+      "cuda_allocator_fraction": 0.5,
+      "cuda_allocator_limit_bytes": 4273242112,
+      "cpu_threads": 4,
+      "interop_threads": 1,
+      "child_wall_time_limit_seconds": 180,
+      "coverage": "PyTorch caching allocator; not all driver GPU or host RAM allocations"
+    },
+    "cudnn_enabled": true,
+    "cudnn_version": 92400
+  },
+  "source_fingerprints": {
+    "configs/default.yaml": "fc07fff636e2ef9e9efc9923c89675b16cc346428d14f7fd5ce253f33b7bcb62",
+    "configs/voicebank.json": "84e498e77a6c038b335482bf3272af98118ce82812e6b8e4875e4c99462e01a6",
+    "configs/training_protocol.yaml": "7222e3b94fbdff817a617096a803016fecce200ccdba49f42dc5181f82ca279d",
+    "configs/tfgridnet.yaml": "4332b61571dbdd0260a75d205bc5e8593020cb17b6d1d371bd9a325dac001a93",
+    "scripts/plan_training.py": "489991278688c9b8fd271604ca7de9251761f28259acc8e2738a64d5b73b9959",
+    "scripts/probe_training.py": "121bef274d0f53f60dad20b15ac8fc462a554e793223ed750d2fc328d1d471ab",
+    "speech_denoising/__init__.py": "10da722ac6c0a2c3cfd5dc80e2bcae4227833d312510736b0ac892c71409df53",
+    "speech_denoising/datasets/__init__.py": "6b51668c0ba6c88e54d33f9029951cf51bf27fc38864cebc0bde751829688f94",
+    "speech_denoising/datasets/voicebank.py": "15e387cd9a9cc2723773b3f48ae3caa5773270a443f9fbe64d8cd04407405993",
+    "speech_denoising/losses/loss.py": "591f022c00593c34b353c90129efaf84ab427b30f0e8ec7a7714e18172798609",
+    "speech_denoising/metrics/__init__.py": "f9f605f0744e007851322684d0b737d8c1a581b2ff4a001ddfc594e702c2623a",
+    "speech_denoising/metrics/audio_metrics.py": "11fb7a68a79abb64620d5e8c816f777cef7b367595d1bc3335839faf81da6cd2",
+    "speech_denoising/models/__init__.py": "d6b811ca0a6cdd7502b043a7d923a15dbd48d561115041c235e279d4d01d49a8",
+    "speech_denoising/models/base.py": "dd8a34b2cfcf5895d2f76b7f9fb16edffaa97accf8c15d2c5d5b3bddd09d80b5",
+    "speech_denoising/models/gtcrn/checkpoint.py": "440375b8aefef1ac3c929ddc8195107b13f66dd64e92351160562d49d2668489",
+    "speech_denoising/models/gtcrn/model.py": "e5b29cd019daca68b459e2e20e8b9ca571f9d931c95b6c7168acf9cf2b21e082",
+    "speech_denoising/models/gtcrn/network.py": "a9a2a8268c682318b58bedc2c9627764fb9397e95adc62c491e885657e0bd9c7",
+    "speech_denoising/models/lisennet/dpr_layer.py": "2108c05517d0f82763ef374b9858a477b11a35a56b295a0492f4bf64ce10c5a3",
+    "speech_denoising/models/lisennet/model.py": "3b8c1be5d2963e9221fac55736c80bd5bd685050c5885bdda41de07b951e780a",
+    "speech_denoising/models/lisennet/network.py": "bb45dffa1cc5e110f7549cc98c5519e0eb61437fdecaa40846e2a38347529dfc",
+    "speech_denoising/models/tfgridnet/assets.py": "0d37607df576a1874ecbff22d96b0b0cf2bb04f7269d6069e8b07ba6460682c8",
+    "speech_denoising/models/tfgridnet/checkpoint.py": "f58120d19dee811ecfde763a5a16927f2badddddc4a199320e2dc3bfbeec5d01",
+    "speech_denoising/models/tfgridnet/model.py": "2357b33a7948d7ac791250574b52fe057ead9723f8c538f94ac8858cf69c77a8",
+    "speech_denoising/models/tfgridnet/network.py": "1e2eea9e2caa42c5a54ac671f042940293cd496b392fd8f153642db364b816da",
+    "speech_denoising/models/tfgridnet/profiles.py": "2ec2bda08e1f3d850f7dd144f9e09b13552a8c0e152262ec2d7a5ab97faf35c4",
+    "speech_denoising/models/tfgridnet/spectral.py": "a79935743938ccba2fbf7757a373d7b746dbaeaa84cdef4149814aadaf2285ad",
+    "speech_denoising/training/__init__.py": "ed673b8581b465994a3c8b345b2b70471f524799899feefdad438e279b05dfa5",
+    "speech_denoising/training/batching.py": "5af6b9dbae1e607c2a841dbf68525a259139ce11c10b6713aaaf972d99f5c4da",
+    "speech_denoising/training/data.py": "f99b585ad6578036e1aa55c225dbf1a387b1ae31b347efb734a218357228bba4",
+    "speech_denoising/training/fixture.py": "80d5abff7379b980575109f4381f8d415bb4f152bf3259fab5eee67bf4ebf203",
+    "speech_denoising/training/preflight.py": "3730728f365f2208494a9025f767418c55b87ca0414d21cda04d4da721fccbc2",
+    "speech_denoising/training/probe.py": "08fd1bda174cc47fb8033d5cc48b123adca12a68e48264eead119b09912d5609",
+    "speech_denoising/training/protocol.py": "3147b22ad6993baf09147b80b6d25030e43ae220fce873333b15261f7a28d0a8",
+    "speech_denoising/training/run_store.py": "58025d6f73db8c2a6a7d5c3037bb287c52ad349aca557c09119fd97e06494c24",
+    "speech_denoising/training/runner.py": "2e4a330613ab6b4edd11b182f7d7a3318d55119a17913fcd0fc7b538b0101286",
+    "speech_denoising/training/selection.py": "76137caa5e860f937af7f8c68a1dfb258e81eecc5794078fbed517b5dce5dd42",
+    "speech_denoising/training/state.py": "549e212e57769f245f637945a5100bfffaeb0639304fd97e7dc92ba07b50fca0",
+    "speech_denoising/training/validation.py": "78a92fc45f39eb1ddd81bb24b03c0f69cd775f50519fe7eb3f702cda3de5733f",
+    "speech_denoising/utils/utils.py": "c8e34a5d2195564ae2bf863544133662580e717f3fe9f873e1917ff387d466d9"
+  },
+  "checkpoint_loaded": false,
+  "optimizer_created": false,
+  "training_performed": false,
+  "quality_scores_generated": false,
+  "complete_validation": false,
+  "test_audio_read": false,
+  "execution_ready": false,
+  "probe_overrides": {
+    "batch_size": 1,
+    "draft_batch_size": 4,
+    "applies_to": "bounded_resource_diagnostic_only"
+  },
+  "draft_batch_size_exercised": false,
+  "launcher": {
+    "file_name": "probe_tfgridnet_memory_trace.py",
+    "source_sha256": "6cd72174814338f6cf13588551294139ef172e584726a50585f55be0877aeb81"
+  },
+  "memory_trace": {
+    "scope": "python_module_and_phase_memory_trace",
+    "events": [
+      {
+        "sequence": 0,
+        "phase": "train_forward",
+        "state": "enter",
+        "call": "model.forward",
+        "input_shapes": [
+          [
+            1,
+            64000
+          ]
+        ],
+        "allocator": {
+          "allocated_bytes.all.current": 34215424,
+          "reserved_bytes.all.current": 50331648,
+          "active_bytes.all.current": 34215424,
+          "inactive_split_bytes.all.current": 14019072,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 1,
+        "phase": "train_forward",
+        "state": "enter",
+        "call": "network.forward",
+        "input_shapes": [
+          [
+            1,
+            64000
+          ],
+          [
+            1
+          ]
+        ],
+        "allocator": {
+          "allocated_bytes.all.current": 34471936,
+          "reserved_bytes.all.current": 50331648,
+          "active_bytes.all.current": 34471936,
+          "inactive_split_bytes.all.current": 13762560,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 2,
+        "phase": "train_forward",
+        "state": "enter",
+        "call": "network.enc.forward",
+        "input_shapes": [
+          [
+            1,
+            64000,
+            1
+          ],
+          [
+            1
+          ]
+        ],
+        "allocator": {
+          "allocated_bytes.all.current": 34728448,
+          "reserved_bytes.all.current": 50331648,
+          "active_bytes.all.current": 34728448,
+          "inactive_split_bytes.all.current": 13506048,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 3,
+        "phase": "train_forward",
+        "state": "return",
+        "call": "network.enc.forward",
+        "input_shapes": [],
+        "allocator": {
+          "allocated_bytes.all.current": 35245056,
+          "reserved_bytes.all.current": 50331648,
+          "active_bytes.all.current": 35245056,
+          "inactive_split_bytes.all.current": 15086592,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 4,
+        "phase": "train_forward",
+        "state": "enter",
+        "call": "network.conv.0.forward",
+        "input_shapes": [
+          [
+            1,
+            2,
+            251,
+            257
+          ]
+        ],
+        "allocator": {
+          "allocated_bytes.all.current": 35760640,
+          "reserved_bytes.all.current": 50331648,
+          "active_bytes.all.current": 35760640,
+          "inactive_split_bytes.all.current": 14571008,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 5,
+        "phase": "train_forward",
+        "state": "return",
+        "call": "network.conv.0.forward",
+        "input_shapes": [],
+        "allocator": {
+          "allocated_bytes.all.current": 48343552,
+          "reserved_bytes.all.current": 77594624,
+          "active_bytes.all.current": 48343552,
+          "inactive_split_bytes.all.current": 14571008,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 6,
+        "phase": "train_forward",
+        "state": "enter",
+        "call": "network.blocks.0.forward",
+        "input_shapes": [
+          [
+            1,
+            48,
+            251,
+            257
+          ]
+        ],
+        "allocator": {
+          "allocated_bytes.all.current": 60730368,
+          "reserved_bytes.all.current": 77594624,
+          "active_bytes.all.current": 60730368,
+          "inactive_split_bytes.all.current": 16864256,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 7,
+        "phase": "train_forward",
+        "state": "enter",
+        "call": "network.blocks.0.intra_rnn.forward",
+        "input_shapes": [
+          [
+            251,
+            254,
+            192
+          ]
+        ],
+        "allocator": {
+          "allocated_bytes.all.current": 147700224,
+          "reserved_bytes.all.current": 190840832,
+          "active_bytes.all.current": 147700224,
+          "inactive_split_bytes.all.current": 17974784,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 8,
+        "phase": "train_forward",
+        "state": "return",
+        "call": "network.blocks.0.intra_rnn.forward",
+        "input_shapes": [],
+        "allocator": {
+          "allocated_bytes.all.current": 737439744,
+          "reserved_bytes.all.current": 2373976064,
+          "active_bytes.all.current": 737439744,
+          "inactive_split_bytes.all.current": 19632128,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 9,
+        "phase": "train_forward",
+        "state": "enter",
+        "call": "network.blocks.0.intra_linear.forward",
+        "input_shapes": [
+          [
+            251,
+            384,
+            254
+          ]
+        ],
+        "allocator": {
+          "allocated_bytes.all.current": 737439744,
+          "reserved_bytes.all.current": 2373976064,
+          "active_bytes.all.current": 737439744,
+          "inactive_split_bytes.all.current": 19632128,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 10,
+        "phase": "train_forward",
+        "state": "return",
+        "call": "network.blocks.0.intra_linear.forward",
+        "input_shapes": [],
+        "allocator": {
+          "allocated_bytes.all.current": 750022656,
+          "reserved_bytes.all.current": 2373976064,
+          "active_bytes.all.current": 750022656,
+          "inactive_split_bytes.all.current": 19632128,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 11,
+        "phase": "train_forward",
+        "state": "enter",
+        "call": "network.blocks.0.inter_rnn.forward",
+        "input_shapes": [
+          [
+            257,
+            248,
+            192
+          ]
+        ],
+        "allocator": {
+          "allocated_bytes.all.current": 824198656,
+          "reserved_bytes.all.current": 2373976064,
+          "active_bytes.all.current": 824198656,
+          "inactive_split_bytes.all.current": 1549777408,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 12,
+        "phase": "train_forward",
+        "state": "return",
+        "call": "network.blocks.0.inter_rnn.forward",
+        "input_shapes": [],
+        "allocator": {
+          "allocated_bytes.all.current": 1413169152,
+          "reserved_bytes.all.current": 3917479936,
+          "active_bytes.all.current": 1413169152,
+          "inactive_split_bytes.all.current": 962904064,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 13,
+        "phase": "train_forward",
+        "state": "enter",
+        "call": "network.blocks.0.inter_linear.forward",
+        "input_shapes": [
+          [
+            257,
+            384,
+            248
+          ]
+        ],
+        "allocator": {
+          "allocated_bytes.all.current": 1412398080,
+          "reserved_bytes.all.current": 3917479936,
+          "active_bytes.all.current": 1412398080,
+          "inactive_split_bytes.all.current": 963675136,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 14,
+        "phase": "train_forward",
+        "state": "return",
+        "call": "network.blocks.0.inter_linear.forward",
+        "input_shapes": [],
+        "allocator": {
+          "allocated_bytes.all.current": 1424783872,
+          "reserved_bytes.all.current": 3917479936,
+          "active_bytes.all.current": 1424783872,
+          "inactive_split_bytes.all.current": 951289344,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 15,
+        "phase": "train_forward",
+        "state": "enter",
+        "call": "network.blocks.0.attn_conv_Q_0.0.forward",
+        "input_shapes": [
+          [
+            1,
+            48,
+            251,
+            257
+          ]
+        ],
+        "allocator": {
+          "allocated_bytes.all.current": 1424783872,
+          "reserved_bytes.all.current": 3917479936,
+          "active_bytes.all.current": 1424783872,
+          "inactive_split_bytes.all.current": 951289344,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 16,
+        "phase": "train_forward",
+        "state": "return",
+        "call": "network.blocks.0.attn_conv_Q_0.0.forward",
+        "input_shapes": [],
+        "allocator": {
+          "allocated_bytes.all.current": 1425299968,
+          "reserved_bytes.all.current": 3917479936,
+          "active_bytes.all.current": 1425299968,
+          "inactive_split_bytes.all.current": 950773248,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 17,
+        "phase": "train_forward",
+        "state": "enter",
+        "call": "network.blocks.0.attn_conv_K_0.0.forward",
+        "input_shapes": [
+          [
+            1,
+            48,
+            251,
+            257
+          ]
+        ],
+        "allocator": {
+          "allocated_bytes.all.current": 1427365376,
+          "reserved_bytes.all.current": 3919577088,
+          "active_bytes.all.current": 1427365376,
+          "inactive_split_bytes.all.current": 950804992,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 18,
+        "phase": "train_forward",
+        "state": "return",
+        "call": "network.blocks.0.attn_conv_K_0.0.forward",
+        "input_shapes": [],
+        "allocator": {
+          "allocated_bytes.all.current": 1427881472,
+          "reserved_bytes.all.current": 3919577088,
+          "active_bytes.all.current": 1427881472,
+          "inactive_split_bytes.all.current": 950288896,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 19,
+        "phase": "train_forward",
+        "state": "enter",
+        "call": "network.blocks.0.attn_conv_V_0.0.forward",
+        "input_shapes": [
+          [
+            1,
+            48,
+            251,
+            257
+          ]
+        ],
+        "allocator": {
+          "allocated_bytes.all.current": 1429946880,
+          "reserved_bytes.all.current": 3923771392,
+          "active_bytes.all.current": 1429946880,
+          "inactive_split_bytes.all.current": 952417792,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 20,
+        "phase": "train_forward",
+        "state": "return",
+        "call": "network.blocks.0.attn_conv_V_0.0.forward",
+        "input_shapes": [],
+        "allocator": {
+          "allocated_bytes.all.current": 1433043456,
+          "reserved_bytes.all.current": 3923771392,
+          "active_bytes.all.current": 1433043456,
+          "inactive_split_bytes.all.current": 949321216,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 21,
+        "phase": "train_forward",
+        "state": "enter",
+        "call": "network.blocks.0.attn_conv_Q_1.0.forward",
+        "input_shapes": [
+          [
+            1,
+            48,
+            251,
+            257
+          ]
+        ],
+        "allocator": {
+          "allocated_bytes.all.current": 1445430784,
+          "reserved_bytes.all.current": 3923771392,
+          "active_bytes.all.current": 1445430784,
+          "inactive_split_bytes.all.current": 936933888,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 22,
+        "phase": "train_forward",
+        "state": "return",
+        "call": "network.blocks.0.attn_conv_Q_1.0.forward",
+        "input_shapes": [],
+        "allocator": {
+          "allocated_bytes.all.current": 1445946880,
+          "reserved_bytes.all.current": 3923771392,
+          "active_bytes.all.current": 1445946880,
+          "inactive_split_bytes.all.current": 936417792,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 23,
+        "phase": "train_forward",
+        "state": "enter",
+        "call": "network.blocks.0.attn_conv_K_1.0.forward",
+        "input_shapes": [
+          [
+            1,
+            48,
+            251,
+            257
+          ]
+        ],
+        "allocator": {
+          "allocated_bytes.all.current": 1448012288,
+          "reserved_bytes.all.current": 3925868544,
+          "active_bytes.all.current": 1448012288,
+          "inactive_split_bytes.all.current": 936449536,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 24,
+        "phase": "train_forward",
+        "state": "return",
+        "call": "network.blocks.0.attn_conv_K_1.0.forward",
+        "input_shapes": [],
+        "allocator": {
+          "allocated_bytes.all.current": 1448528384,
+          "reserved_bytes.all.current": 3925868544,
+          "active_bytes.all.current": 1448528384,
+          "inactive_split_bytes.all.current": 935933440,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 25,
+        "phase": "train_forward",
+        "state": "enter",
+        "call": "network.blocks.0.attn_conv_V_1.0.forward",
+        "input_shapes": [
+          [
+            1,
+            48,
+            251,
+            257
+          ]
+        ],
+        "allocator": {
+          "allocated_bytes.all.current": 1450593792,
+          "reserved_bytes.all.current": 3927965696,
+          "active_bytes.all.current": 1450593792,
+          "inactive_split_bytes.all.current": 935965184,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 26,
+        "phase": "train_forward",
+        "state": "return",
+        "call": "network.blocks.0.attn_conv_V_1.0.forward",
+        "input_shapes": [],
+        "allocator": {
+          "allocated_bytes.all.current": 1453690368,
+          "reserved_bytes.all.current": 3927965696,
+          "active_bytes.all.current": 1453690368,
+          "inactive_split_bytes.all.current": 932868608,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 27,
+        "phase": "train_forward",
+        "state": "enter",
+        "call": "network.blocks.0.attn_conv_Q_2.0.forward",
+        "input_shapes": [
+          [
+            1,
+            48,
+            251,
+            257
+          ]
+        ],
+        "allocator": {
+          "allocated_bytes.all.current": 1466865152,
+          "reserved_bytes.all.current": 3927965696,
+          "active_bytes.all.current": 1466865152,
+          "inactive_split_bytes.all.current": 919693824,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 28,
+        "phase": "train_forward",
+        "state": "return",
+        "call": "network.blocks.0.attn_conv_Q_2.0.forward",
+        "input_shapes": [],
+        "allocator": {
+          "allocated_bytes.all.current": 1467381248,
+          "reserved_bytes.all.current": 3927965696,
+          "active_bytes.all.current": 1467381248,
+          "inactive_split_bytes.all.current": 919177728,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 29,
+        "phase": "train_forward",
+        "state": "enter",
+        "call": "network.blocks.0.attn_conv_K_2.0.forward",
+        "input_shapes": [
+          [
+            1,
+            48,
+            251,
+            257
+          ]
+        ],
+        "allocator": {
+          "allocated_bytes.all.current": 1469446656,
+          "reserved_bytes.all.current": 3930062848,
+          "active_bytes.all.current": 1469446656,
+          "inactive_split_bytes.all.current": 919209472,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 30,
+        "phase": "train_forward",
+        "state": "return",
+        "call": "network.blocks.0.attn_conv_K_2.0.forward",
+        "input_shapes": [],
+        "allocator": {
+          "allocated_bytes.all.current": 1469962752,
+          "reserved_bytes.all.current": 3930062848,
+          "active_bytes.all.current": 1469962752,
+          "inactive_split_bytes.all.current": 918693376,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 31,
+        "phase": "train_forward",
+        "state": "enter",
+        "call": "network.blocks.0.attn_conv_V_2.0.forward",
+        "input_shapes": [
+          [
+            1,
+            48,
+            251,
+            257
+          ]
+        ],
+        "allocator": {
+          "allocated_bytes.all.current": 1472028160,
+          "reserved_bytes.all.current": 3934257152,
+          "active_bytes.all.current": 1472028160,
+          "inactive_split_bytes.all.current": 920822272,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 32,
+        "phase": "train_forward",
+        "state": "return",
+        "call": "network.blocks.0.attn_conv_V_2.0.forward",
+        "input_shapes": [],
+        "allocator": {
+          "allocated_bytes.all.current": 1475124736,
+          "reserved_bytes.all.current": 3934257152,
+          "active_bytes.all.current": 1475124736,
+          "inactive_split_bytes.all.current": 917725696,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 33,
+        "phase": "train_forward",
+        "state": "enter",
+        "call": "network.blocks.0.attn_conv_Q_3.0.forward",
+        "input_shapes": [
+          [
+            1,
+            48,
+            251,
+            257
+          ]
+        ],
+        "allocator": {
+          "allocated_bytes.all.current": 1487512064,
+          "reserved_bytes.all.current": 3934257152,
+          "active_bytes.all.current": 1487512064,
+          "inactive_split_bytes.all.current": 905338368,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 34,
+        "phase": "train_forward",
+        "state": "return",
+        "call": "network.blocks.0.attn_conv_Q_3.0.forward",
+        "input_shapes": [],
+        "allocator": {
+          "allocated_bytes.all.current": 1488028160,
+          "reserved_bytes.all.current": 3934257152,
+          "active_bytes.all.current": 1488028160,
+          "inactive_split_bytes.all.current": 904822272,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 35,
+        "phase": "train_forward",
+        "state": "enter",
+        "call": "network.blocks.0.attn_conv_K_3.0.forward",
+        "input_shapes": [
+          [
+            1,
+            48,
+            251,
+            257
+          ]
+        ],
+        "allocator": {
+          "allocated_bytes.all.current": 1490093568,
+          "reserved_bytes.all.current": 3936354304,
+          "active_bytes.all.current": 1490093568,
+          "inactive_split_bytes.all.current": 904854016,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 36,
+        "phase": "train_forward",
+        "state": "return",
+        "call": "network.blocks.0.attn_conv_K_3.0.forward",
+        "input_shapes": [],
+        "allocator": {
+          "allocated_bytes.all.current": 1490609664,
+          "reserved_bytes.all.current": 3936354304,
+          "active_bytes.all.current": 1490609664,
+          "inactive_split_bytes.all.current": 904337920,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 37,
+        "phase": "train_forward",
+        "state": "enter",
+        "call": "network.blocks.0.attn_conv_V_3.0.forward",
+        "input_shapes": [
+          [
+            1,
+            48,
+            251,
+            257
+          ]
+        ],
+        "allocator": {
+          "allocated_bytes.all.current": 1492675072,
+          "reserved_bytes.all.current": 3938451456,
+          "active_bytes.all.current": 1492675072,
+          "inactive_split_bytes.all.current": 904369664,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 38,
+        "phase": "train_forward",
+        "state": "return",
+        "call": "network.blocks.0.attn_conv_V_3.0.forward",
+        "input_shapes": [],
+        "allocator": {
+          "allocated_bytes.all.current": 1495771648,
+          "reserved_bytes.all.current": 3938451456,
+          "active_bytes.all.current": 1495771648,
+          "inactive_split_bytes.all.current": 901273088,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 39,
+        "phase": "train_forward",
+        "state": "enter",
+        "call": "network.blocks.0.attn_concat_proj.0.forward",
+        "input_shapes": [
+          [
+            1,
+            48,
+            251,
+            257
+          ]
+        ],
+        "allocator": {
+          "allocated_bytes.all.current": 1585170944,
+          "reserved_bytes.all.current": 3940548608,
+          "active_bytes.all.current": 1585170944,
+          "inactive_split_bytes.all.current": 813970944,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 40,
+        "phase": "train_forward",
+        "state": "return",
+        "call": "network.blocks.0.attn_concat_proj.0.forward",
+        "input_shapes": [],
+        "allocator": {
+          "allocated_bytes.all.current": 1597556736,
+          "reserved_bytes.all.current": 3940548608,
+          "active_bytes.all.current": 1597556736,
+          "inactive_split_bytes.all.current": 801585152,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 41,
+        "phase": "train_forward",
+        "state": "return",
+        "call": "network.blocks.0.forward",
+        "input_shapes": [],
+        "allocator": {
+          "allocated_bytes.all.current": 1616623104,
+          "reserved_bytes.all.current": 3940548608,
+          "active_bytes.all.current": 1616623104,
+          "inactive_split_bytes.all.current": 782518784,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 42,
+        "phase": "train_forward",
+        "state": "enter",
+        "call": "network.blocks.1.forward",
+        "input_shapes": [
+          [
+            1,
+            48,
+            251,
+            257
+          ]
+        ],
+        "allocator": {
+          "allocated_bytes.all.current": 1604237312,
+          "reserved_bytes.all.current": 3940548608,
+          "active_bytes.all.current": 1604237312,
+          "inactive_split_bytes.all.current": 780224512,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 43,
+        "phase": "train_forward",
+        "state": "enter",
+        "call": "network.blocks.1.intra_rnn.forward",
+        "input_shapes": [
+          [
+            251,
+            254,
+            192
+          ]
+        ],
+        "allocator": {
+          "allocated_bytes.all.current": 1690615808,
+          "reserved_bytes.all.current": 3940548608,
+          "active_bytes.all.current": 1690615808,
+          "inactive_split_bytes.all.current": 708526080,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 44,
+        "phase": "train_forward",
+        "state": "return",
+        "call": "network.blocks.1.intra_rnn.forward",
+        "input_shapes": [],
+        "allocator": {
+          "allocated_bytes.all.current": 2279715328,
+          "reserved_bytes.all.current": 3940548608,
+          "active_bytes.all.current": 2279715328,
+          "inactive_split_bytes.all.current": 119426560,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 45,
+        "phase": "train_forward",
+        "state": "enter",
+        "call": "network.blocks.1.intra_linear.forward",
+        "input_shapes": [
+          [
+            251,
+            384,
+            254
+          ]
+        ],
+        "allocator": {
+          "allocated_bytes.all.current": 2279715328,
+          "reserved_bytes.all.current": 3940548608,
+          "active_bytes.all.current": 2279715328,
+          "inactive_split_bytes.all.current": 119426560,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 46,
+        "phase": "train_forward",
+        "state": "return",
+        "call": "network.blocks.1.intra_linear.forward",
+        "input_shapes": [],
+        "allocator": {
+          "allocated_bytes.all.current": 2292936192,
+          "reserved_bytes.all.current": 3940548608,
+          "active_bytes.all.current": 2292936192,
+          "inactive_split_bytes.all.current": 106205696,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 47,
+        "phase": "train_forward",
+        "state": "enter",
+        "call": "network.blocks.1.inter_rnn.forward",
+        "input_shapes": [
+          [
+            257,
+            248,
+            192
+          ]
+        ],
+        "allocator": {
+          "allocated_bytes.all.current": 2366915072,
+          "reserved_bytes.all.current": 3940548608,
+          "active_bytes.all.current": 2366915072,
+          "inactive_split_bytes.all.current": 1573633536,
+          "num_alloc_retries": 0,
+          "num_ooms": 0
+        }
+      },
+      {
+        "sequence": 48,
+        "phase": "train_forward",
+        "state": "error",
+        "call": "network.blocks.1.inter_rnn.forward",
+        "input_shapes": [
+          [
+            257,
+            248,
+            192
+          ]
+        ],
+        "allocator": {
+          "allocated_bytes.all.current": 2367704576,
+          "reserved_bytes.all.current": 3940548608,
+          "active_bytes.all.current": 2367704576,
+          "inactive_split_bytes.all.current": 1572844032,
+          "num_alloc_retries": 1,
+          "num_ooms": 1
+        },
+        "exception_type": "OutOfMemoryError",
+        "python_traceback": [
+          {
+            "file": "probe_tfgridnet_memory_trace.py",
+            "line": 127,
+            "function": "call",
+            "statement": "value = function(*args, **kwargs)"
+          },
+          {
+            "file": "rnn.py",
+            "line": 1164,
+            "function": "forward",
+            "statement": "result = _VF.lstm("
+          }
+        ]
+      },
+      {
+        "sequence": 49,
+        "phase": "train_forward",
+        "state": "error",
+        "call": "network.blocks.1.forward",
+        "input_shapes": [
+          [
+            1,
+            48,
+            251,
+            257
+          ]
+        ],
+        "allocator": {
+          "allocated_bytes.all.current": 2367704576,
+          "reserved_bytes.all.current": 3940548608,
+          "active_bytes.all.current": 2367704576,
+          "inactive_split_bytes.all.current": 1572844032,
+          "num_alloc_retries": 1,
+          "num_ooms": 1
+        },
+        "exception_type": "OutOfMemoryError"
+      },
+      {
+        "sequence": 50,
+        "phase": "train_forward",
+        "state": "error",
+        "call": "network.forward",
+        "input_shapes": [
+          [
+            1,
+            64000
+          ],
+          [
+            1
+          ]
+        ],
+        "allocator": {
+          "allocated_bytes.all.current": 2367704576,
+          "reserved_bytes.all.current": 3940548608,
+          "active_bytes.all.current": 2367704576,
+          "inactive_split_bytes.all.current": 1572844032,
+          "num_alloc_retries": 1,
+          "num_ooms": 1
+        },
+        "exception_type": "OutOfMemoryError"
+      },
+      {
+        "sequence": 51,
+        "phase": "train_forward",
+        "state": "error",
+        "call": "model.forward",
+        "input_shapes": [
+          [
+            1,
+            64000
+          ]
+        ],
+        "allocator": {
+          "allocated_bytes.all.current": 2367704576,
+          "reserved_bytes.all.current": 3940548608,
+          "active_bytes.all.current": 2367704576,
+          "inactive_split_bytes.all.current": 1572844032,
+          "num_alloc_retries": 1,
+          "num_ooms": 1
+        },
+        "exception_type": "OutOfMemoryError"
+      }
+    ],
+    "first_failure": {
+      "sequence": 48,
+      "phase": "train_forward",
+      "state": "error",
+      "call": "network.blocks.1.inter_rnn.forward",
+      "input_shapes": [
+        [
+          257,
+          248,
+          192
+        ]
+      ],
+      "allocator": {
+        "allocated_bytes.all.current": 2367704576,
+        "reserved_bytes.all.current": 3940548608,
+        "active_bytes.all.current": 2367704576,
+        "inactive_split_bytes.all.current": 1572844032,
+        "num_alloc_retries": 1,
+        "num_ooms": 1
+      },
+      "exception_type": "OutOfMemoryError",
+      "python_traceback": [
+        {
+          "file": "probe_tfgridnet_memory_trace.py",
+          "line": 127,
+          "function": "call",
+          "statement": "value = function(*args, **kwargs)"
+        },
+        {
+          "file": "rnn.py",
+          "line": 1164,
+          "function": "forward",
+          "statement": "result = _VF.lstm("
+        }
+      ]
+    },
+    "completed_phases": [],
+    "dropped_events": 0,
+    "tensor_references_retained": false,
+    "trace_synchronization": false,
+    "kernel_level_attribution": false,
+    "workspace_vs_backward_reserve_attribution": false,
+    "timings_comparable_to_untraced_probe": false
+  }
+}
