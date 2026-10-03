@@ -1,0 +1,55 @@
+schema_version: 1
+status: draft
+comparison_type: unified_training_from_scratch
+sample_rate: 16000
+
+split:
+  algorithm: speaker_sha256_v1
+  seed: 42
+  validation_speakers: 2
+
+models:
+  gtcrn: configs/gtcrn.yaml
+  lisennet: configs/lisennet.yaml
+  tfgridnet: configs/tfgridnet.yaml
+
+training:
+  seeds: [42, 43, 44]
+  initialization: random
+  segment_samples: 64000
+  short_utterance: right_zero_pad_with_valid_length
+  batch_size: 4
+  drop_last: false
+  epochs: 100
+  optimizer: AdamW
+  learning_rate: 0.001
+  weight_decay: 0.0
+  betas: [0.9, 0.999]
+  gradient_clip_norm: 5.0
+  precision: float32
+  scheduler: none
+  early_stopping: false
+  device: unselected
+
+loss:
+  name: negative_si_snr
+  zero_mean: true
+  epsilon: 0.000000000001
+  reduction: utterance_mean
+  padded_samples: excluded
+  silent_clean_reference: error
+
+validation:
+  segment: complete_utterance
+  batch_size: 1
+  selection_metric: loss
+  selection_direction: minimize
+  tie_break: earliest_epoch
+  frequency: every_epoch_via_separate_entrypoint
+
+test:
+  split: fixed_824
+  use: final_selected_checkpoint_only
+  tuning: forbidden
+
+# Proposed shared settings, not an implemented trainer or upstream recipe.

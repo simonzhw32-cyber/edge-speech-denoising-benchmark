@@ -126,4 +126,7 @@ split, loss, budget, seeds and checkpoint-selection rule, followed by a controll
 comparison. Keep the repository private. Source revisions and original license
 notices live beside each model; [history](docs/history.md) records earlier milestones.
 
+The [training draft](docs/training_protocol.md) adds a speaker-disjoint split
+planner and synthetic checks. It does not execute training or verify local audio.
+
 Framework reference: [edge-kws-benchmark](https://github.com/kittytinglee/edge-kws-benchmark).
