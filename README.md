@@ -1,5 +1,8 @@
 # Edge Speech Denoising Benchmark
 
+> **2026-10-05 update:** GTCRN random seed-42 completed 25 epochs; epoch 24 was selected and evaluated on all 824 test items. See [experiment results](docs/gtcrn_seed42_pilot.md). Earlier pending-execution descriptions below refer to the prior milestone.
+
+
 GTCRN, LiSenNet and original TF-GridNet in one codebase, with a shared
 16 kHz waveform interface and VoiceBank-DEMAND evaluation.
 
@@ -16,10 +19,13 @@ All adapters map mono `[batch, samples]` tensors to the same shape.
 six-layer local profile (8,381,504 parameters); the DNS loader uses the separate
 four-layer `dns_ins20_epoch33` profile (2,552,790 parameters).
 
-Training and validation have separate entry points. They currently execute only
-an explicit synthetic GTCRN fixture, with saved epoch state, validation reports
-and checkpoint selection. Real-data training remains disabled while the protocol
-is a draft. Shared loss, crop/batch and state components are available.
+Training and validation have separate entry points. In addition to the synthetic
+GTCRN fixture, an explicit `--real` GTCRN path binds a verified VoiceBank train
+manifest and preflight report, updates parameters, saves epoch state, and requires
+independent complete held-out validation before the next epoch. It supports either
+random initialization or the checksum-pinned upstream GTCRN checkpoint and records
+that choice in the run identity. No real training run is included in this repository;
+the protocol and long-run budget remain a draft.
 [Training-data preflight](docs/training_preflight.md) verifies existing local
 train audio and binds the draft speaker split; it does not enable training.
 
@@ -125,9 +131,9 @@ reference checks. The pretrained checks additionally require the corresponding
 local weights: `scripts.smoke_gtcrn_pretrained` and `scripts.smoke_tfgridnet_pretrained`.
 Synthetic checks are separate from dataset quality evaluation.
 
-Next work is a unified training pipeline with a reproducible train/validation
-split, loss, budget, seeds and checkpoint-selection rule, followed by a controlled
-comparison. Source revisions and original license
+Next work is to run a small approved GTCRN integration experiment on a suitable
+GPU, then freeze the comparison budget and extend the verified runner to the other
+models. Source revisions and original license
 notices live beside each model; [history](docs/history.md) records earlier milestones.
 
 The [training draft](docs/training_protocol.md) adds a speaker-disjoint split
@@ -143,6 +149,8 @@ through `python -m scripts.smoke_training_preflight`; it performs no model updat
 The [bounded resource probe](docs/training_probe.md) checks one configured train
 batch and one full validation utterance on an explicit device, without optimizer
 steps. A passing probe does not yet enable real-data training.
+The [real GTCRN runner](docs/real_training.md) documents the separate train and
+validation commands, initialization provenance, saved artifacts and safety gates.
 
 Framework reference: [edge-kws-benchmark](https://github.com/kittytinglee/edge-kws-benchmark).
 

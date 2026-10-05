@@ -3,8 +3,9 @@
 These components support the [draft training protocol](training_protocol.md).
 The separate `scripts.train` and `scripts.validate` commands now exercise a
 [synthetic entry-point fixture](training_runner.md), with persisted reports and
-selection history. Real-data runner wiring and hardware feasibility checks are
-still needed; these components do not freeze the draft protocol.
+selection history. The [real GTCRN runner](real_training.md) now wires these
+components to verified train data; hardware feasibility and a frozen budget are
+still needed.
 
 ## Experiment identity
 
@@ -59,8 +60,9 @@ negative SI-SNR loss averaged per utterance. No cropping or padded batches are
 accepted. It restores per-module modes and random states, and leaves gradients
 alone. It does not compute PESQ/STOI or change benchmark timing conditions.
 
-For production use, the dataset must be a `torch.utils.data.Subset` of a verified,
-complete train `VoiceBankDataset`. The supplied plan is recomputed against its
+For production use, the dataset must be the plan-bound `TrainingSubset` (or an
+equivalent `torch.utils.data.Subset`) of a verified complete train
+`VoiceBankDataset`. The supplied plan is recomputed against its
 parent metadata and compared to the identity and ordered validation IDs. Audio
 bytes are checked when each item is read. Test data, arbitrary datasets and
 incomplete validation sets are rejected. This component consumes existing local
@@ -69,8 +71,8 @@ data; it does not prepare or download it.
 The caller must first restore the named checkpoint and pass its returned hash.
 A report records that hash, epoch, identity, ordered-ID fingerprint, count and
 macro loss. The component cannot independently prove that an arbitrary in-memory
-model came from the supplied hash; the fixture validation entry point owns
-that loading/report-writing sequence; a real-data entry point is still needed. Model adapters are expected not to modify
+model came from the supplied hash; both fixture and real validation entry points
+own that loading/report-writing sequence. Model adapters are expected not to modify
 buffers in eval mode; the component does not snapshot arbitrary forward side effects.
 
 Synthetic datasets require `synthetic=True`; their report scope is
@@ -84,9 +86,8 @@ finite macro loss, with the earliest epoch breaking exact ties. Conflicting
 reports for one epoch are rejected. It returns a copy rather than modifying a
 caller-owned report. It neither deletes files nor tunes against the fixed test.
 
-The fixture orchestrator persists complete validation reports, folds them
-through this rule and names the retained checkpoint. A future real-data runner
-must preserve the same binding and train-only selection policy. Saving/loading training state
+The fixture and real GTCRN orchestrators persist complete validation reports,
+fold them through this rule and name the retained checkpoint. Saving/loading training state
 alone does not persist the selection history. Fixture reports can only be selected
 with the explicit `synthetic=True` flag.
 

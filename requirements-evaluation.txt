@@ -1,0 +1,3 @@
+# Full four-metric evaluation; install the desired Torch build first.
+-r requirements-benchmark.txt
+pesq==0.0.4

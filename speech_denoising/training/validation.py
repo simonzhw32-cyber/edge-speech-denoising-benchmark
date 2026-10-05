@@ -30,20 +30,32 @@ def run_validation(model, dataset, identity, validation_ids, *, epoch,
     if len(dataset) != len(ids):
         raise ValueError("Validation subset must cover every planned validation utterance")
     if not synthetic:
+        if plan is None:
+            raise ValueError("Production validation requires the parent training plan")
         from speech_denoising.datasets.voicebank import VoiceBankDataset
+        from .data import TrainingSubset
         from torch.utils.data import Subset
-        parent = dataset.dataset if isinstance(dataset, Subset) else None
+        if isinstance(dataset, TrainingSubset):
+            if dataset.split != "validation" or list(dataset.utterance_ids) != ids or (
+                    dataset.plan_sha256 != fingerprint(plan)):
+                raise ValueError("Validation view differs from the bound validation plan")
+            parent = dataset._parent
+        else:
+            parent = dataset.dataset if isinstance(dataset, Subset) else None
         if not isinstance(parent, VoiceBankDataset) or parent.split != "train" or not (
                 parent.verify_files and parent.protocol_complete):
             raise ValueError("Use a subset of the verified complete train dataset, never test")
         from .protocol import build_training_plan
-        from .selection import experiment_identity
-        if plan is None:
-            raise ValueError("Production validation requires the parent training plan")
+        from .selection import execution_identity, experiment_identity
         rebuilt = build_training_plan(parent.metadata, parent.metadata["source"],
                                       plan["protocol"], plan["model"], plan["model_settings"])
-        if experiment_identity(rebuilt, identity["seed"]) != identity or (
-                rebuilt["split"]["validation_ids"] != ids):
+        if "initialization" in identity:
+            expected_identity = execution_identity(
+                rebuilt, identity["seed"], identity["initialization"],
+                identity["initial_checkpoint_sha256"])
+        else:
+            expected_identity = experiment_identity(rebuilt, identity["seed"])
+        if expected_identity != identity or rebuilt["split"]["validation_ids"] != ids:
             raise ValueError("Validation subset differs from the recomputed train-only split")
     parameters = list(model.parameters())
     buffers = list(model.buffers())

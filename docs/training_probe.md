@@ -4,7 +4,8 @@ This is a device and waveform feasibility check. It constructs one random-weight
 model from the current draft config, checks one training batch with backward,
 then checks one complete validation utterance without backward. It creates no
 optimizer, takes no parameter updates and writes no checkpoint or quality score.
-The train/validate entry points retain their existing synthetic-only behavior.
+The probe is still diagnostic only; the separate real GTCRN entry points require
+explicit initialization and run-budget choices before shared resources are used.
 
 ## Inputs and selection
 

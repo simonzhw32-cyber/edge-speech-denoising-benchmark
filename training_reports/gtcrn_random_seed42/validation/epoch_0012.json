@@ -1,0 +1,21 @@
+{
+  "checkpoint_sha256": "560238f8de45ab30eb17d83394b984b4085b20c2196c31c0ebe73d0712201917",
+  "count": 794,
+  "epoch": 12,
+  "identity": {
+    "initial_checkpoint_sha256": null,
+    "initialization": "random",
+    "model": "gtcrn",
+    "model_settings_sha256": "9e51eaea9abc32bcb610b989c305eee2532df136ba47de6933278b5d419c7539",
+    "profile": "native_default",
+    "protocol_sha256": "4a7242c5363d4a342c7cc96edc65f764bb0106f6e2a4f62c158e8dd5e5ff7305",
+    "seed": 42,
+    "split_sha256": "0a1ebb0028dfa7d4a5c7971636e54a7a14576d13d8a0760537e1668361f5d220"
+  },
+  "loss": "negative_si_snr",
+  "mean_loss": -14.45518777156319,
+  "reduction": "utterance_mean",
+  "schema_version": 1,
+  "scope": "complete_train_validation",
+  "validation_ids_sha256": "75d36d7ebcc9deadf8eea2fc8860066e1e53a1504af27b92f567140d30bda82e"
+}

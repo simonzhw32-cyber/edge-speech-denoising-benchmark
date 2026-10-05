@@ -1,6 +1,6 @@
 # Requirements and acceptance status
 
-Review baseline: `b8aee8eed15f8f326d26576aa2f554ac3b169fe5`, 2026-10-04
+Review baseline: `6c2c965`, 2026-10-04
 (Asia/Shanghai). This review reads the actual repository, including committed
 benchmark and training-resource reports. No `AGENTS.md` or teacher-authored
 acceptance checklist is present in this snapshot. The requirements below are
@@ -16,10 +16,10 @@ and engineering tests are not additional requirements attributed to the group.
 | R3 | Pinned public dataset, fixed test and reproducible validation from train | Implemented in preparation/planning | `configs/voicebank.json`, manifests, speaker-disjoint plan and complete train-audio preflight |
 | R4 | Common PESQ-WB, STOI, SI-SNR, improvement, RTF and parameter counts | Complete for two pretrained baselines | Both full 824-item JSON reports include four quality metrics, full coverage and zero failures |
 | R5 | Explain three-model baseline availability and training provenance | Partial | LiSenNet checkpoint provenance remains unresolved; do not assign a random-weight score as its pretrained baseline |
-| R6 | Separate training and validation entry points with resumable state | Synthetic execution implemented; real-data integration pending | `scripts/train.py`, `scripts/validate.py`, state/selection components; real epoch and held-out validation must still be connected |
+| R6 | Separate training and validation entry points with resumable state | Implemented for GTCRN; execution pending | `scripts/train.py --real` updates from verified VoiceBank train data and saves state; `scripts.validate --real` restores it and performs independent held-out validation |
 | R7 | Controlled comparison under a recorded shared training protocol | Pending | Random initialization, shared split/loss/exposure and seeds; selected checkpoints and full test reports after real runs |
 | R8 | On-board profiling / edge deployment evidence | Pending | Record agreed target hardware, runtime, model/profile, precision, workload, latency and memory; desktop RTF is not on-board profiling |
-| R9 | Repository visibility follows group agreement | Needs confirmation | Previously requested private; this review can access a public repository after the user opened it. If private remains required, change it back after review |
+| R9 | Repository visibility follows group agreement | Private required; unchanged here | Keep the repository private and invite only the designated group members; this implementation does not change visibility or invitations |
 
 R7's proposed settings live in [training_protocol.md](training_protocol.md) and
 `configs/training_protocol.yaml`: seeds 42/43/44, four-second crops, batch four,
@@ -81,10 +81,10 @@ for the recorded GPU environment and new-machine setup.
 
 1. Restore the checkout and the intended interpreter. Restore local train data
    only if absent; old absolute paths in archived reports are not portable.
-2. Connect `TrainingSubset`, batching, loss, optimizer, run persistence and state
-   restoration to real-data training; bind the split, source and runtime to the
-   run identity. Keep validation in its independent entry point.
-3. Run **one real GTCRN epoch**, then all 794 held-out validation utterances.
+2. Choose random initialization or pinned-checkpoint fine-tuning and approve a
+   small first-run resource budget; these are distinct experiments.
+3. Run **one real GTCRN epoch**, then all 794 held-out validation utterances,
+   using the implemented separate entry points.
    Save epoch state, optimizer/RNG state, loss history and checkpoint selection.
    Check epoch-boundary resume before starting the longer run. This first epoch
    is an integration/stability check, not a final baseline result.
@@ -102,9 +102,9 @@ fingerprints, optimizer settings, precision/backend flags, completed epochs and
 steps, selection evidence and checkpoint hash. Preserve partial/failed runs as
 such; do not merge them into a completed experiment.
 
-The current `train.py` and `validate.py` still expose only synthetic execution.
-No real training command, trained checkpoint, convergence curve or final
-controlled comparison exists at this baseline.
+The current `train.py` and `validate.py` expose guarded real GTCRN execution, but
+no real trained checkpoint, convergence curve or final controlled comparison
+exists at this baseline.
 
 ## Materials to retain
 

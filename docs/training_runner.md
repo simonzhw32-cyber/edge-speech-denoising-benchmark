@@ -1,7 +1,8 @@
 # Training and validation entry-point fixture
 
-The separate `scripts.train` and `scripts.validate` commands now exercise an
-end-to-end **synthetic** experiment. Real-data execution is still disabled. The
+The separate `scripts.train` and `scripts.validate` commands exercise this
+end-to-end **synthetic** experiment. A separate guarded [real GTCRN mode](real_training.md)
+now reuses the same core state and validation components. The
 [training protocol](training_protocol.md) remains a draft; this fixture does not
 freeze its proposed budget or select target hardware.
 
@@ -26,8 +27,7 @@ checks; this entry-point fixture does not establish that their training runs wor
 epoch ordering, retained partial batches, FP32 forward/backward, finite gradient
 clipping and AdamW updates. Its returned mean is weighted by utterance count,
 including the last partial batch. It computes no validation. This routine is a
-building block; its caller remains responsible for using a verified train-only
-plan before any future real-data execution.
+building block; the real caller binds it to a verified train-only plan.
 
 ## Separate commands
 
@@ -49,9 +49,9 @@ python -m scripts.validate --fixture --run-dir results/training_fixture/example 
 
 These commands perform actual optimizer updates on generated waveforms. They are
 optional; the smoke test already exercises this sequence in temporary run folders.
-Do not run them as a request to train on VoiceBank. There is no `--manifest` or
-real-data execution option at this stage. Training supports the GTCRN fixture
-only and rejects skipped/repeated epochs, changed seeds/specs and a pending
+Do not run them as a request to train on VoiceBank. The separate `--real` mode
+requires a manifest and preflight report. This fixture mode supports GTCRN only
+and rejects skipped/repeated epochs, changed seeds/specs and a pending
 previous validation. Epoch 3 is rejected. Both CLI entry points require an
 explicit execution mode; the former configuration-only invocation is replaced
 by `--describe`.
@@ -116,7 +116,7 @@ repeated or unvalidated epochs. Temporary files are removed afterwards. These
 updates provide no evidence of speech quality, convergence or real-data memory
 feasibility.
 
-Next work is the verified full-train dataset/plan binding for the real trainer,
-production validation/report entry-point wiring, an explicit hardware feasibility
-run and protocol freezing. No full training or fixed-test evaluation should begin
-from this fixture command.
+The verified full-train binding and production GTCRN entry points are documented
+separately in [real_training.md](real_training.md). Hardware feasibility and
+protocol freezing remain pending. No full training or fixed-test evaluation
+should begin from this fixture command.

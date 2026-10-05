@@ -29,9 +29,9 @@ when restoring a computer.
 
 Subsequent work implements a draft training protocol, speaker split, length-aware
 SI-SNR loss, paired waveform batching, epoch state restoration, independent
-validation components and a synthetic GTCRN runner. Real train-data preflight
-and bounded resource probes are also available. Real-data training is still
-unavailable through the current CLI; no selected real-data checkpoint exists.
+validation components and a synthetic GTCRN runner. Real train-data preflight,
+bounded resource probes and guarded real GTCRN train/validation entry points are
+also available. No selected real-data checkpoint exists.
 
 | Stage | Outcome | Evidence |
 |---|---|---|
@@ -39,6 +39,7 @@ unavailable through the current CLI; no selected real-data checkpoint exists.
 | Synthetic runner (3.4) | Separate train/validate CLI and epoch-boundary resume fixture | `docs/training_runner.md` |
 | Train data (3.5) | Complete local audio preflight and plan-bound dataset views | `docs/training_preflight.md`, archived `gtcrn_audio.json` |
 | Resource probes (3.6) | GTCRN/LiSenNet bounded checks passed; capped TF-GridNet checks failed with OOM | `docs/training_probe.md`, `training_reports/phase36_windows/` |
+| Real GTCRN runner | Verified train updates, immutable epoch state and separate complete held-out validation are wired; no real run claimed | `docs/real_training.md`, `speech_denoising/training/real_runner.py` |
 | Memory trace | Batch-one TF-GridNet failure located in second block inter-RNN during forward | `b8aee8e`, archived trace JSON and launcher |
 
 [Requirements and acceptance status](project_requirements.md) separates this

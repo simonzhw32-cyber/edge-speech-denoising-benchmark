@@ -1,9 +1,9 @@
 # Training-data preflight
 
 This stage checks an **existing** prepared train manifest and its local audio.
-It does not download missing data, construct a model, update parameters, run
-validation scores, or enable real-data execution. `scripts.train` and
-`scripts.validate` retain their explicit synthetic-only behavior.
+It does not download missing data, construct a model, update parameters or run
+validation scores. Its report is a required input to the separate guarded GTCRN
+real-training and validation entry points.
 
 ## What is bound
 
@@ -99,8 +99,7 @@ fail if train data is absent. `--model lisennet` and `--model tfgridnet` select
 their draft constructor configuration while retaining the same split. They do
 not execute those models. A separate report filename is required for each run.
 
-Before real-data training can start, production entry points still need to bind
-verified plans and experiment identities, select and record the device/runtime,
-check crop and memory feasibility, and integrate saved epoch/validation history.
-Those steps must keep train and validation separate and leave the fixed test
-out of tuning and checkpoint selection.
+The production GTCRN entry points bind this report to the plan and experiment
+identity, record the selected device/runtime and retain separate epoch/validation
+history. A successful preflight alone is not permission to consume shared GPU
+resources; initialization and a small first-run budget must still be confirmed.

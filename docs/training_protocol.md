@@ -3,9 +3,10 @@
 Phase 3.1 adds a planning tool, not a trainer. The settings in
 [training_protocol.yaml](../configs/training_protocol.yaml) are proposed shared
 settings, not tuned hyperparameters or a reproduction of the authors' recipes.
-`scripts.train` and `scripts.validate` now have an explicit
-[synthetic entry-point fixture](training_runner.md); real-data execution remains disabled. The shared waveform
-loss and crop/collator implementation is described in [components](training_components.md).
+`scripts.train` and `scripts.validate` have an explicit
+[synthetic entry-point fixture](training_runner.md) and a guarded
+[real GTCRN path](real_training.md). The shared waveform loss and crop/collator
+implementation is described in [components](training_components.md).
 Existing pretrained baselines and the fixed test protocol are unchanged.
 
 ## Split policy

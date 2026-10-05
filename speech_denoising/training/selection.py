@@ -39,17 +39,44 @@ def experiment_identity(plan, seed):
     }
 
 
+def execution_identity(plan, seed, initialization, checkpoint_sha256=None):
+    """Extend the planned experiment identity with explicit initialization provenance."""
+    identity = experiment_identity(plan, seed)
+    if initialization == "random":
+        if checkpoint_sha256 is not None:
+            raise ValueError("Random initialization cannot name a checkpoint")
+    elif initialization == "pretrained":
+        if plan["model"] != "gtcrn" or not _hash(checkpoint_sha256):
+            raise ValueError("Pretrained execution currently requires the pinned GTCRN checkpoint")
+    else:
+        raise ValueError("Initialization must be random or pretrained")
+    identity.update(initialization=initialization, initial_checkpoint_sha256=checkpoint_sha256)
+    return identity
+
+
 def validate_identity(identity):
-    expected = {"model", "profile", "seed", "protocol_sha256", "split_sha256", "model_settings_sha256"}
-    if not isinstance(identity, dict) or set(identity) != expected:
+    base = {"model", "profile", "seed", "protocol_sha256", "split_sha256", "model_settings_sha256"}
+    extended = base | {"initialization", "initial_checkpoint_sha256"}
+    if not isinstance(identity, dict) or set(identity) not in (base, extended):
         raise ValueError("Invalid experiment identity fields")
     profile = "local_6layer" if identity["model"] == "tfgridnet" else "native_default"
     if identity["model"] not in ("gtcrn", "lisennet", "tfgridnet") or identity["profile"] != profile:
         raise ValueError("Invalid training model/profile")
     if type(identity["seed"]) is not int or identity["seed"] < 0:
         raise ValueError("Invalid training seed")
-    if not all(_hash(identity[k]) for k in expected if k.endswith("sha256")):
+    if not all(_hash(identity[k]) for k in base if k.endswith("sha256")):
         raise ValueError("Invalid experiment fingerprints")
+    if set(identity) == extended:
+        initialization = identity["initialization"]
+        checkpoint = identity["initial_checkpoint_sha256"]
+        if initialization == "random":
+            if checkpoint is not None:
+                raise ValueError("Random initialization cannot name a checkpoint")
+        elif initialization == "pretrained":
+            if identity["model"] != "gtcrn" or not _hash(checkpoint):
+                raise ValueError("Pretrained identity requires a GTCRN checkpoint hash")
+        else:
+            raise ValueError("Invalid initialization mode")
 
 
 def validate_report(report, identity, validation_ids, *, synthetic=False):

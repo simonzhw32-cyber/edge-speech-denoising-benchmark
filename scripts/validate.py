@@ -1,4 +1,4 @@
-"""Load a recorded fixture checkpoint and persist independent validation/selection."""
+"""Independently validate a recorded synthetic or real GTCRN checkpoint."""
 
 import argparse
 from pathlib import Path
@@ -29,14 +29,30 @@ def validate_fixture(directory, epoch):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--fixture", action="store_true", required=True, help="Synthetic fixture scope only")
+    mode = parser.add_mutually_exclusive_group(required=True)
+    mode.add_argument("--fixture", action="store_true", help="Synthetic fixture scope only")
+    mode.add_argument("--real", action="store_true", help="Verified VoiceBank GTCRN validation")
     parser.add_argument("--run-dir", type=Path, required=True)
     parser.add_argument("--epoch", type=int, required=True)
+    parser.add_argument("--manifest", type=Path)
+    parser.add_argument("--preflight", type=Path)
+    parser.add_argument("--device", choices=("cpu", "cuda"))
     args = parser.parse_args()
     try:
-        report, selection = validate_fixture(args.run_dir, args.epoch)
-        print(f"Saved synthetic validation epoch {report['epoch']}; complete utterances: {report['count']}")
-        print(f"Selected fixture epoch: {selection['best']['epoch']}. No VoiceBank quality scores.")
+        if args.fixture:
+            if any(value is not None for value in (args.manifest, args.preflight, args.device)):
+                parser.error("--fixture does not accept real-data inputs")
+            report, selection = validate_fixture(args.run_dir, args.epoch)
+            print(f"Saved synthetic validation epoch {report['epoch']}; complete utterances: {report['count']}")
+            print(f"Selected fixture epoch: {selection['best']['epoch']}. No VoiceBank quality scores.")
+            return
+        if any(value is None for value in (args.manifest, args.preflight, args.device)):
+            parser.error("--real requires --manifest, --preflight and --device")
+        from speech_denoising.training.real_runner import validate_real_epoch
+        report, selection = validate_real_epoch(
+            args.manifest, args.preflight, args.run_dir, args.epoch, device=args.device)
+        print(f"Saved real validation epoch {report['epoch']}; complete utterances: {report['count']}")
+        print(f"Selected GTCRN epoch: {selection['best']['epoch']} by held-out train loss.")
     except (OSError, ValueError, KeyError, TypeError, RuntimeError) as error:
         parser.exit(1, f"ERROR: {error}\n")
 
