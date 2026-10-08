@@ -1,4 +1,4 @@
-"""Evaluate the validation-selected GTCRN checkpoint on the fixed test split."""
+"""Evaluate the validation-selected GTCRN/LiSenNet checkpoint on the fixed test split."""
 
 import argparse
 import hashlib
@@ -14,10 +14,8 @@ import torch
 from scripts.evaluate import implementation_record
 from speech_denoising.datasets import VoiceBankDataset
 from speech_denoising.metrics.audio_metrics import QUALITY_METRICS, evaluate
-from speech_denoising.models.gtcrn.model import GTCRNModel
 from speech_denoising.training.real_store import audit_run, checkpoint_path, read_json, run_path
-from speech_denoising.training.probe import source_hashes
-from speech_denoising.training.real_runner import SOURCE_FILES
+from speech_denoising.training.real_runner import build_training_model, verify_run_sources
 try:
     from speech_denoising.training.state import load_model_state_for_evaluation
 except ImportError:
@@ -144,10 +142,9 @@ def main(argv=None):
     best = selection.get("best")
     if not best or not reports or best["epoch"] > len(records):
         raise ValueError("The run has no complete validation-only checkpoint selection")
-    if spec["model"] != "gtcrn" or spec["identity"]["profile"] != "native_default":
-        raise ValueError("Trained evaluation currently supports the native GTCRN profile only")
-    if source_hashes(SOURCE_FILES) != spec["source_fingerprints"]:
-        raise ValueError("Training/model sources changed since the selected run")
+    if spec["model"] not in ("gtcrn", "lisennet") or spec["identity"]["profile"] != "native_default":
+        raise ValueError("Trained evaluation currently supports native GTCRN/LiSenNet profiles only")
+    verify_run_sources(spec)
     checkpoint = checkpoint_path(run, best["epoch"])
     if selection.get("checkpoint") != str(checkpoint.relative_to(run)):
         raise ValueError("Selection checkpoint path differs from the selected epoch")
@@ -159,7 +156,7 @@ def main(argv=None):
         raise ValueError("CUDA was requested but is unavailable; there is no CPU fallback")
     torch.set_num_threads(args.threads)
     device = torch.device("cuda:0" if args.device == "cuda" else "cpu")
-    model = GTCRNModel(**spec["plan"]["model_settings"]["constructor_kwargs"])
+    model = build_training_model(spec)
     model.to(device=device, dtype=torch.float32)
     loaded = load_model_state_for_evaluation(checkpoint, model, spec["identity"])
     if (loaded["completed_epoch"] != best["epoch"] or
@@ -167,7 +164,7 @@ def main(argv=None):
             loaded["checkpoint_sha256"] != best["checkpoint_sha256"]):
         raise ValueError("Loaded checkpoint differs from the validation-selected epoch")
     report = evaluate(model, dataset, metrics=args.metrics, warmup=args.warmup, repeats=args.repeats)
-    implementation = implementation_record("gtcrn")
+    implementation = implementation_record(spec["model"])
     implementation["source_fingerprints"].update({
         "scripts/evaluate_trained.py": _sha256_text(REPO_ROOT / "scripts/evaluate_trained.py"),
         "speech_denoising/training/real_store.py": _sha256_text(REPO_ROOT / "speech_denoising/training/real_store.py"),
@@ -175,7 +172,7 @@ def main(argv=None):
         "speech_denoising/training/selection.py": _sha256_text(REPO_ROOT / "speech_denoising/training/selection.py"),
     })
     report.update(
-        model="gtcrn", profile=spec["identity"]["profile"],
+        model=spec["model"], profile=spec["identity"]["profile"],
         comparison_type=("unified_training_draft; not final comparison"
                          if spec["initialization"]["mode"] == "random"
                          else "pretrained_finetuning_integration"),

@@ -44,3 +44,22 @@ also available. No selected real-data checkpoint exists.
 
 [Requirements and acceptance status](project_requirements.md) separates this
 implementation progress from completed research experiments.
+
+## GTCRN pilot and LiSenNet execution follow-up
+
+`ae846dd` archived 25 GTCRN training epochs, 25 held-out validations and the
+complete 824-item four-metric test. Validation chose epoch 24; final training
+progress reached 67,375 optimizer steps. Weights are Release assets.
+
+The follow-up implements random LiSenNet real training, independent validation
+and selected-checkpoint test routing. Git-only provenance changes no longer block
+new-run resume; source/runtime/data changes remain rejected. Historical reports
+and weights are preserved. LiSenNet real-data execution and a matched three-model
+comparison remain pending.
+
+
+## LiSenNet pilot completed — 2026-10-08
+
+LiSenNet random seed 42 completed 25 real training epochs and 25 independent validations. Validation selected epoch 21; all 824 fixed test utterances were evaluated with PESQ, STOI, SI-SNR and SI-SNR improvement. See [experiment results](lisennet_seed42_pilot.md).
+
+This update supersedes earlier statements that LiSenNet real execution is pending. TF-GridNet real training and a complete three-model comparison remain pending; edge-device efficiency is not established.

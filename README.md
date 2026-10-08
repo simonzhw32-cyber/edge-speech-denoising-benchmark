@@ -1,6 +1,6 @@
 # Edge Speech Denoising Benchmark
 
-> **2026-10-05 update:** GTCRN random seed-42 completed 25 epochs; epoch 24 was selected and evaluated on all 824 test items. See [experiment results](docs/gtcrn_seed42_pilot.md). Earlier pending-execution descriptions below refer to the prior milestone.
+> **Current milestone:** GTCRN random seed-42 completed 25 epochs; epoch 24 was selected and evaluated on all 824 test items. See [experiment results](docs/gtcrn_seed42_pilot.md). GTCRN and LiSenNet have separate real training/validation entry points; LiSenNet real-data results are pending.
 
 
 GTCRN, LiSenNet and original TF-GridNet in one codebase, with a shared
@@ -20,12 +20,14 @@ six-layer local profile (8,381,504 parameters); the DNS loader uses the separate
 four-layer `dns_ins20_epoch33` profile (2,552,790 parameters).
 
 Training and validation have separate entry points. In addition to the synthetic
-GTCRN fixture, an explicit `--real` GTCRN path binds a verified VoiceBank train
+GTCRN fixture, an explicit `--real` GTCRN/LiSenNet path binds a verified VoiceBank train
 manifest and preflight report, updates parameters, saves epoch state, and requires
 independent complete held-out validation before the next epoch. It supports either
 random initialization or the checksum-pinned upstream GTCRN checkpoint and records
-that choice in the run identity. No real training run is included in this repository;
-the protocol and long-run budget remain a draft.
+that choice in the run identity. GTCRN seed 42 completed a 25-epoch pilot with 25 independent validations;
+epoch 24 was evaluated on the complete test split. The protocol and final
+three-model comparison budget remain a draft. LiSenNet supports random
+initialization; accepted upstream fine-tuning remains GTCRN-only.
 [Training-data preflight](docs/training_preflight.md) verifies existing local
 train audio and binds the draft speaker split; it does not enable training.
 
@@ -51,12 +53,34 @@ Exact DNS training manifests and selection logs are unavailable. RTF is listed
 with its run conditions in [results](docs/results.md); the runs were made on
 different computers, so their runtimes are not ranked here.
 
+## Locally trained GTCRN pilot
+
+| Initialization / selected epoch | PESQ-WB | STOI | SI-SNR (dB) | Improvement (dB) |
+|---|---:|---:|---:|---:|
+| Random seed 42 / epoch 24 of 25 | 2.57246 | 0.93428 | 18.70302 | 10.25748 |
+
+This pilot trained on 10,778 utterances and validated on 794 held-out train
+utterances. It is separate from the official pretrained results above.
+
+Weights are **Release assets**, not part of `git clone`. Download
+[`gtcrn_seed42_epoch25_20261005_204146.tar.gz`](https://github.com/simonzhw32-cyber/edge-speech-denoising-benchmark/releases/download/gtcrn-seed42-pilot-25ep/gtcrn_seed42_epoch25_20261005_204146.tar.gz)
+and [`archive.sha256`](https://github.com/simonzhw32-cyber/edge-speech-denoising-benchmark/releases/download/gtcrn-seed42-pilot-25ep/archive.sha256)
+from the [pilot Release](https://github.com/simonzhw32-cyber/edge-speech-denoising-benchmark/releases/tag/gtcrn-seed42-pilot-25ep).
+Verify the archive hash before extracting it. The selected checkpoint is
+`results/training_runs/gtcrn_random_seed42/checkpoints/epoch_0024.pt`;
+epoch 25 retains the final optimizer/RNG state.
+
+For this historical experiment, use the Release tag checkout and its archived
+run. Its strict source fingerprints intentionally reject later training-code
+changes. See [restore and evaluate](docs/gtcrn_seed42_pilot.md).
+For new LiSenNet work, see [the real runner commands](docs/real_training.md).
+
 ## Dataset
 
 [VoiceBank-DEMAND-16k](https://huggingface.co/datasets/JacobLinCool/VoiceBank-DEMAND-16k)
 is a standard speech enhancement benchmark: **11,572 train** and **824 test**
-utterances. The test split is fixed by the dataset protocol. Future validation
-must come from train, with no test-based tuning or checkpoint selection.
+utterances. The test split is fixed by the dataset protocol. Validation
+comes from train, with no test-based tuning or checkpoint selection.
 
 [configs/voicebank.json](configs/voicebank.json) pins the source revision,
 parquet sizes and hashes. Preparation validates audio pairs and preserves their
@@ -131,9 +155,9 @@ reference checks. The pretrained checks additionally require the corresponding
 local weights: `scripts.smoke_gtcrn_pretrained` and `scripts.smoke_tfgridnet_pretrained`.
 Synthetic checks are separate from dataset quality evaluation.
 
-Next work is to run a small approved GTCRN integration experiment on a suitable
-GPU, then freeze the comparison budget and extend the verified runner to the other
-models. Source revisions and original license
+Next work is one LiSenNet real epoch plus complete independent validation,
+followed by a recorded pilot budget. Six-layer TF-GridNet real training remains
+pending. The 25-epoch GTCRN pilot does not establish a completed three-model comparison. Source revisions and original license
 notices live beside each model; [history](docs/history.md) records earlier milestones.
 
 The [training draft](docs/training_protocol.md) adds a speaker-disjoint split
@@ -156,3 +180,8 @@ Framework reference: [edge-kws-benchmark](https://github.com/kittytinglee/edge-k
 
 See [requirements and acceptance status](docs/project_requirements.md) for the
 remaining work, dependency roles and the next real-training milestone.
+
+
+## LiSenNet pilot completed — 2026-10-08
+
+25 real training epochs and independent validations completed; epoch 21 selected and evaluated on the fixed 824-utterance test set. See [results and GTCRN comparison](docs/lisennet_seed42_pilot.md). Weights are provided in the `lisennet-seed42-pilot-25ep` Release.

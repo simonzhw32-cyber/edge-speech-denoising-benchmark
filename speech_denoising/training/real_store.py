@@ -46,8 +46,9 @@ def validate_spec(spec):
     plan = spec.get("plan")
     if not isinstance(plan, dict) or fingerprint(plan) != spec.get("plan_sha256"):
         raise ValueError("Run plan fingerprint differs")
-    if plan.get("model") != "gtcrn" or identity.get("model") != "gtcrn":
-        raise ValueError("The first real-training milestone supports GTCRN only")
+    if (spec.get("model") not in ("gtcrn", "lisennet") or
+            plan.get("model") != spec["model"] or identity.get("model") != spec["model"]):
+        raise ValueError("Run, plan and identity must name the same supported model")
     train_ids = plan.get("split", {}).get("train_ids")
     validation_ids = plan.get("split", {}).get("validation_ids")
     if any(not isinstance(ids, list) or not ids or ids != sorted(set(ids))
@@ -71,7 +72,8 @@ def validate_spec(spec):
     if initialization["mode"] == "random":
         if digest is not None or initialization.get("checkpoint_source") is not None:
             raise ValueError("Random initialization cannot name a checkpoint")
-    elif digest != CHECKPOINT_SHA256 or initialization.get("checkpoint_source") != "gtcrn_vctk_demand_official":
+    elif (spec["model"] != "gtcrn" or digest != CHECKPOINT_SHA256 or
+          initialization.get("checkpoint_source") != "gtcrn_vctk_demand_official"):
         raise ValueError("Pretrained initialization must name the pinned GTCRN checkpoint")
     expected_identity = execution_identity(
         plan, identity["seed"], initialization["mode"], digest)

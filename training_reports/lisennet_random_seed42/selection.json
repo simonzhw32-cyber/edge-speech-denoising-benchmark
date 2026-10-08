@@ -1,0 +1,29 @@
+{
+  "best": {
+    "checkpoint_sha256": "470a6f3be2d77355afca21e99cd3ab01232389c30bc1d14cd8307323d2153a80",
+    "count": 794,
+    "epoch": 21,
+    "identity": {
+      "initial_checkpoint_sha256": null,
+      "initialization": "random",
+      "model": "lisennet",
+      "model_settings_sha256": "a2d2b75f2e3b053fad3accb58e3196bd281f9adabf95866271df9fb18d2985e9",
+      "profile": "native_default",
+      "protocol_sha256": "4a7242c5363d4a342c7cc96edc65f764bb0106f6e2a4f62c158e8dd5e5ff7305",
+      "seed": 42,
+      "split_sha256": "0a1ebb0028dfa7d4a5c7971636e54a7a14576d13d8a0760537e1668361f5d220"
+    },
+    "loss": "negative_si_snr",
+    "mean_loss": -14.784733074062718,
+    "reduction": "utterance_mean",
+    "schema_version": 1,
+    "scope": "complete_train_validation",
+    "validation_ids_sha256": "75d36d7ebcc9deadf8eea2fc8860066e1e53a1504af27b92f567140d30bda82e"
+  },
+  "checkpoint": "checkpoints/epoch_0021.pt",
+  "reports_sha256": "fc7bd94c5c9396aae196d6aa773c5f543d0f23556a365278af831c8e19aad47e",
+  "schema_version": 1,
+  "scope": "real_voicebank_training",
+  "spec_sha256": "da57fd6ec847a8e76749ab9b6b71b6909114e99c8d860fe612b0b72ba95d0adc",
+  "validated_epochs": 25
+}

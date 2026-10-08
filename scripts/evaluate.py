@@ -79,6 +79,8 @@ def implementation_record(model_name):
              "speech_denoising/datasets/voicebank.py", "configs/voicebank.json",
              "speech_denoising/models/base.py"]
     suffixes = ["network.py", "model.py", "checkpoint.py"]
+    if model_name == "lisennet":
+        suffixes = ["network.py", "model.py", "dpr_layer.py"]
     if model_name == "tfgridnet":
         suffixes += ["spectral.py", "profiles.py", "assets.py"]
     names += [f"speech_denoising/models/{model_name}/{suffix}" for suffix in suffixes]

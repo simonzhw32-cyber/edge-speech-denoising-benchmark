@@ -26,10 +26,10 @@ def rejected(operation):
     raise AssertionError("Invalid real-training input was accepted")
 
 
-def tiny_spec(initialization="random"):
+def tiny_spec(initialization="random", model="gtcrn"):
     protocol = load_config("configs/training_protocol.yaml")
     protocol["training"].update(segment_samples=8, batch_size=2, epochs=2)
-    settings = model_settings(protocol, "gtcrn")
+    settings = model_settings(protocol, model)
     split = {
         "algorithm": protocol["split"]["algorithm"], "seed": protocol["split"]["seed"],
         "parent_rows_sha256": "1" * 64, "train_speakers": ["p226"],
@@ -39,7 +39,7 @@ def tiny_spec(initialization="random"):
     }
     plan = {
         "schema_version": 1, "scope": "training_metadata_plan", "status": "draft",
-        "model": "gtcrn", "model_settings": settings, "protocol": protocol,
+        "model": model, "model_settings": settings, "protocol": protocol,
         "protocol_sha256": fingerprint(protocol), "source": {"fixture": True},
         "split": split, "split_sha256": fingerprint(split),
         "counts": {"parent_train": 5, "train": 3, "validation": 2},
@@ -60,7 +60,7 @@ def tiny_spec(initialization="random"):
         "weight_decay", "betas", "gradient_clip_norm", "precision")}
     runtime_settings.update(device="cpu", deterministic_algorithms=False)
     return {
-        "schema_version": 1, "scope": "real_voicebank_training", "model": "gtcrn",
+        "schema_version": 1, "scope": "real_voicebank_training", "model": model,
         "purpose": ("unified_training_from_scratch" if initialization == "random"
                     else "pretrained_finetuning_integration"),
         "identity": identity,
@@ -79,6 +79,47 @@ def metadata_checks(folder):
     spec = tiny_spec()
     validate_spec(spec)
     validate_spec(tiny_spec("pretrained"))
+    validate_spec(tiny_spec(model="lisennet"))
+    changed = tiny_spec(model="lisennet")
+    changed["model"] = "gtcrn"
+    rejected(lambda: validate_spec(changed))
+    rejected(lambda: tiny_spec("pretrained", model="lisennet"))
+    from speech_denoising.training.real_runner import verify_resume_spec, source_files
+    same = deepcopy(spec)
+    same["git"] = {"commit": "6" * 40, "dirty": False, "changed_paths": []}
+    verify_resume_spec(spec, same)
+    for field in ("runtime", "source_fingerprints", "settings", "plan", "identity",
+                  "manifest_sha256", "preflight_sha256"):
+        changed = deepcopy(same)
+        changed[field] = {"changed": True}
+        rejected(lambda: verify_resume_spec(spec, changed))
+    for model in ("gtcrn", "lisennet"):
+        names = source_files(model)
+        assert len(names) == len(set(names))
+        assert all((REPO_ROOT / name).is_file() for name in names)
+    names = source_files("lisennet")
+    assert "speech_denoising/models/lisennet/dpr_layer.py" in names
+    assert not any("models/gtcrn/" in name for name in names)
+    rejected(lambda: source_files("tfgridnet"))
+    from speech_denoising.training import real_runner
+    from speech_denoising.training.probe import source_hashes
+    current = tiny_spec(model="lisennet")
+    current["source_fingerprints"] = source_hashes(source_files("lisennet"))
+    real_runner.verify_run_sources(current)
+    current["source_fingerprints"]["speech_denoising/models/lisennet/dpr_layer.py"] = "0" * 64
+    rejected(lambda: real_runner.verify_run_sources(current))
+    fixture = tiny_spec(model="lisennet")
+    with patch.object(real_runner, "bind_preflight", return_value=(
+            Path("fixture.json"), b"manifest", {}, fixture["plan"], b"preflight")) as binding, \
+            patch.object(real_runner, "_runtime", return_value={"device": "cpu"}), \
+            patch.object(real_runner, "_git_state", return_value=fixture["git"]):
+        built = real_runner.build_run_spec("manifest", "preflight", seed=42,
+                                          device="cpu", initialization="random", model="lisennet")
+        binding.assert_called_once_with("manifest", "preflight", "lisennet")
+        validate_spec(built)
+        assert built["model"] == built["identity"]["model"] == "lisennet"
+        rejected(lambda: real_runner.build_run_spec("manifest", "preflight", seed=42,
+            device="cpu", initialization="pretrained", model="lisennet"))
     changed = deepcopy(spec)
     changed["identity"]["split_sha256"] = "9" * 64
     rejected(lambda: validate_spec(changed))
@@ -110,7 +151,7 @@ def metadata_checks(folder):
     print("PASS: real-run identity, pinned initialization, immutable epoch and selection metadata")
 
 
-def tensor_checks(folder):
+def tensor_checks(folder, model_name="gtcrn"):
     import torch
     from torch import nn
     from speech_denoising.datasets.voicebank import VoiceBankDataset
@@ -118,12 +159,22 @@ def tensor_checks(folder):
     from speech_denoising.training import protocol as protocol_module
     from speech_denoising.training import real_runner
 
-    spec = tiny_spec()
+    spec = tiny_spec(model=model_name)
+    if model_name == "lisennet":
+        spec["plan"]["protocol"]["training"]["segment_samples"] = 1024
+        spec["plan"]["protocol_sha256"] = fingerprint(spec["plan"]["protocol"])
+        spec["identity"] = execution_identity(spec["plan"], 42, "random")
+        spec["plan_sha256"] = fingerprint(spec["plan"])
+        spec["settings"]["segment_samples"] = 1024
     plan = spec["plan"]
     rows = {}
     for index, identifier in enumerate(
             plan["split"]["train_ids"] + plan["split"]["validation_ids"]):
-        clean = torch.linspace(-1.0, 1.0, 12 + index, dtype=torch.float32)
+        if model_name == "lisennet":
+            generator = torch.Generator().manual_seed(100 + index)
+            clean = 0.2 * torch.randn(1200 + index, generator=generator)
+        else:
+            clean = torch.linspace(-1.0, 1.0, 12 + index, dtype=torch.float32)
         noisy = clean + 0.05 * torch.sin(torch.arange(clean.numel(), dtype=torch.float32))
         rows[identifier] = {"utterance_id": identifier, "sample_rate": 16000,
                             "noisy_audio": noisy, "clean_audio": clean}
@@ -160,7 +211,7 @@ def tensor_checks(folder):
     def context(saved_spec, **kwargs):
         nonlocal initial
         torch.manual_seed(7)
-        model = TinyWaveform()
+        model = real_runner.build_training_model(saved_spec) if model_name == "lisennet" else TinyWaveform()
         if initial is None:
             initial = deepcopy(model.state_dict())
         settings = saved_spec["settings"]
@@ -169,7 +220,7 @@ def tensor_checks(folder):
             weight_decay=settings["weight_decay"], betas=tuple(settings["betas"]))
         return model, optimizer
 
-    run = folder / "tensor"
+    run = folder / ("tensor_" + model_name)
     manifest = folder / "manifest.json"
     preflight = folder / "preflight.json"
     manifest.write_text("{}", encoding="utf-8")
@@ -180,18 +231,54 @@ def tensor_checks(folder):
             patch.object(real_runner, "TrainingSubset", FixtureSubset), \
             patch.object(protocol_module, "build_training_plan", return_value=plan):
         training = real_runner.train_real_epoch(
-            manifest, preflight, run, 1, seed=42, device="cpu", initialization="random")
+            manifest, preflight, run, 1, seed=42, device="cpu", initialization="random", model=model_name)
         assert training["count"] == 3 and training["global_step"] == 2
+        rejected(lambda: real_runner.train_real_epoch(
+            manifest, preflight, run, 2, seed=42, device="cpu", initialization="random", model=model_name))
         payload = torch.load(checkpoint_path(run, 1), map_location="cpu", weights_only=True)
         assert any(not torch.equal(value, initial[name]) for name, value in payload["model"].items())
         report, selection = real_runner.validate_real_epoch(
             manifest, preflight, run, 1, device="cpu")
         assert report["count"] == 2 and selection["best"] == report
+        proposed = deepcopy(spec)
+        proposed["git"] = {"commit": "6" * 40, "dirty": False, "changed_paths": []}
+        with patch.object(real_runner, "build_run_spec", return_value=proposed):
+            second = real_runner.train_real_epoch(
+                manifest, preflight, run, 2, seed=42, device="cpu", initialization="random", model=model_name)
+        assert second["global_step"] == 4
+        real_runner.validate_real_epoch(manifest, preflight, run, 2, device="cpu")
+        assert audit_run(run)[0] == spec  # Original provenance is never rewritten.
         rejected(lambda: real_runner.train_real_epoch(
-            manifest, preflight, run, 1, seed=42, device="cpu", initialization="random"))
+            manifest, preflight, run, 1, seed=42, device="cpu", initialization="random", model=model_name))
     _, records, reports = audit_run(run, spec, require_selection=True)
-    assert len(records) == len(reports) == 1
-    print("PASS: generated-audio real path updates parameters, saves state and validates separately")
+    assert len(records) == len(reports) == 2
+    print(f"PASS: generated-audio {model_name} updates, pending-validation gate and post-commit resume")
+    if model_name == "lisennet":
+        from scripts import evaluate_trained
+        class FixedTestFixture:
+            protocol_complete = True
+            def __init__(self, *args, **kwargs):
+                assert kwargs == {"split": "test", "verify_files": True, "require_complete": True}
+            def __len__(self):
+                return 824
+        output = REPO_ROOT / "results/trained_reports" / (folder.name + "_lisennet.json")
+        fixture_report = {"scope": "synthetic_test_routing_fixture", "evaluated_count": 824,
+                          "manifest_count": 824, "summary": {"enhanced": {}}, "failed_utterances": []}
+        try:
+            with patch.object(evaluate_trained, "verify_run_sources"), \
+                    patch.object(evaluate_trained, "VoiceBankDataset", FixedTestFixture), \
+                    patch.object(evaluate_trained, "evaluate", return_value=fixture_report):
+                evaluate_trained.main(["--run-dir", str(run), "--manifest", str(manifest),
+                                       "--output", str(output), "--device", "cpu"])
+            from speech_denoising.training.run_store import read_json
+            result = read_json(output)
+            assert result["model"] == "lisennet"
+            assert result["checkpoint"]["sha256"] == audit_run(run)[2][result["checkpoint"]["completed_epoch"] - 1]["checkpoint_sha256"]
+            assert result["implementation"]["source_fingerprints"].get("speech_denoising/models/lisennet/dpr_layer.py")
+            assert result["training_run"]["identity"] == spec["identity"]
+        finally:
+            output.unlink(missing_ok=True)
+        print("PASS: LiSenNet selected weights load and route to the shared test runner (metrics mocked)")
 
 
 def main():
@@ -204,7 +291,10 @@ def main():
     try:
         metadata_checks(folder)
         if not args.metadata_only:
+            import torch
+            torch.set_num_threads(2)
             tensor_checks(folder)
+            tensor_checks(folder, "lisennet")
         else:
             print("Metadata only; no framework import, model update or audio access.")
     finally:

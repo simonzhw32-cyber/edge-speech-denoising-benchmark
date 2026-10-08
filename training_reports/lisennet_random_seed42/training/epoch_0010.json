@@ -1,0 +1,9 @@
+{
+  "checkpoint_sha256": "0e1a52af54dd5ef763fd7e59f5e6830a6cf4d5a7505357135b7c30835cf0a781",
+  "count": 10778,
+  "epoch": 10,
+  "global_step": 26950,
+  "mean_loss": -14.722127063154858,
+  "scope": "real_voicebank_training",
+  "spec_sha256": "da57fd6ec847a8e76749ab9b6b71b6909114e99c8d860fe612b0b72ba95d0adc"
+}

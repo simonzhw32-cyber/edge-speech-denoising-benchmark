@@ -1,4 +1,4 @@
-"""Independently validate a recorded synthetic or real GTCRN checkpoint."""
+"""Independently validate a recorded synthetic or real GTCRN/LiSenNet checkpoint."""
 
 import argparse
 from pathlib import Path
@@ -31,7 +31,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--fixture", action="store_true", help="Synthetic fixture scope only")
-    mode.add_argument("--real", action="store_true", help="Verified VoiceBank GTCRN validation")
+    mode.add_argument("--real", action="store_true", help="Verified VoiceBank GTCRN/LiSenNet validation")
     parser.add_argument("--run-dir", type=Path, required=True)
     parser.add_argument("--epoch", type=int, required=True)
     parser.add_argument("--manifest", type=Path)
@@ -52,7 +52,7 @@ def main():
         report, selection = validate_real_epoch(
             args.manifest, args.preflight, args.run_dir, args.epoch, device=args.device)
         print(f"Saved real validation epoch {report['epoch']}; complete utterances: {report['count']}")
-        print(f"Selected GTCRN epoch: {selection['best']['epoch']} by held-out train loss.")
+        print(f"Selected epoch: {selection['best']['epoch']} by held-out train loss.")
     except (OSError, ValueError, KeyError, TypeError, RuntimeError) as error:
         parser.exit(1, f"ERROR: {error}\n")
 

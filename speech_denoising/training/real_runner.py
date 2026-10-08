@@ -1,4 +1,4 @@
-"""Verified GTCRN real-data epoch and independent validation coordination."""
+"""Verified GTCRN/LiSenNet real-data epoch and independent validation coordination."""
 
 import hashlib
 import platform
@@ -12,7 +12,6 @@ from .protocol import fingerprint
 from .real_store import (audit_run, checkpoint_path, create_run, persist_training,
                          persist_validation, run_path)
 from .selection import execution_identity
-from .state import load_training_state, save_training_state
 
 
 SOURCE_FILES = [
@@ -29,6 +28,47 @@ SOURCE_FILES = [
     "speech_denoising/training/selection.py", "speech_denoising/training/state.py",
     "speech_denoising/training/validation.py", "speech_denoising/utils/utils.py",
 ]
+
+
+def source_files(model):
+    """Fingerprint the selected architecture and shared execution code."""
+    if model == "gtcrn":
+        return list(SOURCE_FILES)
+    if model != "lisennet":
+        raise ValueError("Real training supports GTCRN and LiSenNet only")
+    names = [name for name in SOURCE_FILES
+             if name not in ("configs/gtcrn.yaml", "speech_denoising/assets/gtcrn.py")
+             and not name.startswith("speech_denoising/models/gtcrn/")]
+    return names + ["configs/lisennet.yaml", "speech_denoising/models/lisennet/model.py",
+                    "speech_denoising/models/lisennet/network.py",
+                    "speech_denoising/models/lisennet/dpr_layer.py"]
+
+
+def build_training_model(spec):
+    model = spec["model"]
+    if model == "gtcrn":
+        from speech_denoising.models.gtcrn.model import GTCRNModel
+        constructor = GTCRNModel
+    elif model == "lisennet":
+        from speech_denoising.models.lisennet.model import LiSenNetModel
+        constructor = LiSenNetModel
+    else:
+        raise ValueError("Real execution supports GTCRN and LiSenNet only")
+    return constructor(**spec["plan"]["model_settings"]["constructor_kwargs"])
+
+
+def verify_run_sources(spec):
+    if source_hashes(source_files(spec["model"])) != spec["source_fingerprints"]:
+        raise ValueError("Training/model sources changed; use the original experiment checkout "
+                         "or start a new run. Do not edit historical run metadata.")
+
+
+def verify_resume_spec(stored, proposed):
+    """Git metadata is provenance; source/data/runtime remain resume invariants."""
+    saved_inputs = {key: value for key, value in stored.items() if key != "git"}
+    current_inputs = {key: value for key, value in proposed.items() if key != "git"}
+    if saved_inputs != current_inputs:
+        raise ValueError("Requested inputs, source fingerprints or runtime differ from the existing run")
 
 
 def _sha256(data):
@@ -64,8 +104,11 @@ def _runtime(device, deterministic):
 
 
 def build_run_spec(manifest_path, preflight_path, *, seed, device, initialization,
-                   initial_checkpoint=None, deterministic_algorithms=False):
-    path, data, _, plan, preflight_bytes = bind_preflight(manifest_path, preflight_path, "gtcrn")
+                   initial_checkpoint=None, deterministic_algorithms=False, model="gtcrn"):
+    source_files(model)
+    if model == "lisennet" and (initialization != "random" or initial_checkpoint is not None):
+        raise ValueError("LiSenNet real training supports random initialization only")
+    path, data, _, plan, preflight_bytes = bind_preflight(manifest_path, preflight_path, model)
     checkpoint_sha256 = None
     initialization_record = {"mode": initialization, "checkpoint_source": None,
                              "checkpoint_sha256": None}
@@ -87,13 +130,13 @@ def build_run_spec(manifest_path, preflight_path, *, seed, device, initializatio
         "weight_decay", "betas", "gradient_clip_norm", "precision")}
     settings.update(device=device, deterministic_algorithms=deterministic_algorithms)
     return {
-        "schema_version": 1, "scope": "real_voicebank_training", "model": "gtcrn",
+        "schema_version": 1, "scope": "real_voicebank_training", "model": model,
         "purpose": ("unified_training_from_scratch" if initialization == "random"
                     else "pretrained_finetuning_integration"),
         "identity": identity, "initialization": initialization_record,
         "plan": plan, "plan_sha256": fingerprint(plan), "settings": settings,
         "manifest_sha256": _sha256(data), "preflight_sha256": _sha256(preflight_bytes),
-        "source_fingerprints": source_hashes(SOURCE_FILES), "git": _git_state(),
+        "source_fingerprints": source_hashes(source_files(model)), "git": _git_state(),
         "runtime": _runtime(device, deterministic_algorithms),
         "manifest_name": path.name,
         "fixed_test_used": False, "complete_validation_required": True,
@@ -103,7 +146,6 @@ def build_run_spec(manifest_path, preflight_path, *, seed, device, initializatio
 def _context(spec, *, initial_checkpoint=None, load_initial=False):
     import numpy as np
     import torch
-    from speech_denoising.models.gtcrn.model import GTCRNModel
     seed = spec["identity"]["seed"]
     random.seed(seed)
     np.random.seed(seed)
@@ -114,7 +156,7 @@ def _context(spec, *, initial_checkpoint=None, load_initial=False):
     device = torch.device("cuda:0" if spec["settings"]["device"] == "cuda" else "cpu")
     if device.type == "cuda" and not torch.cuda.is_available():
         raise ValueError("CUDA was requested but is unavailable; there is no CPU fallback")
-    model = GTCRNModel(**spec["plan"]["model_settings"]["constructor_kwargs"])
+    model = build_training_model(spec)
     if load_initial and spec["initialization"]["mode"] == "pretrained":
         if initial_checkpoint is None:
             raise ValueError("The first pretrained epoch requires --initial-checkpoint")
@@ -132,25 +174,26 @@ def _context(spec, *, initial_checkpoint=None, load_initial=False):
 
 
 def _verify_current_inputs(spec, manifest_path, preflight_path):
-    path, data, _, plan, preflight_bytes = bind_preflight(manifest_path, preflight_path, "gtcrn")
+    path, data, _, plan, preflight_bytes = bind_preflight(manifest_path, preflight_path, spec["model"])
     if (_sha256(data) != spec["manifest_sha256"] or
             _sha256(preflight_bytes) != spec["preflight_sha256"] or
-            plan != spec["plan"] or source_hashes(SOURCE_FILES) != spec["source_fingerprints"]):
+            plan != spec["plan"]):
         raise ValueError("Manifest, preflight, plan or training source changed since run creation")
+    verify_run_sources(spec)
     return path, plan
 
 
 def train_real_epoch(manifest_path, preflight_path, directory, epoch, *, seed, device,
-                     initialization, initial_checkpoint=None, deterministic_algorithms=False):
+                     initialization, initial_checkpoint=None, deterministic_algorithms=False, model="gtcrn"):
+    from .state import load_training_state, save_training_state
     from .runner import train_one_epoch
     proposed = build_run_spec(manifest_path, preflight_path, seed=seed, device=device,
                               initialization=initialization, initial_checkpoint=initial_checkpoint,
-                              deterministic_algorithms=deterministic_algorithms)
+                              deterministic_algorithms=deterministic_algorithms, model=model)
     run = run_path(directory)
     if run.exists():
         spec, records, reports = audit_run(run, require_selection=True)
-        if proposed != spec:
-            raise ValueError("Requested inputs or runtime differ from the existing run")
+        verify_resume_spec(spec, proposed)
     else:
         if epoch != 1:
             raise ValueError("A new real-data run must start at epoch 1")
@@ -182,6 +225,7 @@ def train_real_epoch(manifest_path, preflight_path, directory, epoch, *, seed, d
 
 
 def validate_real_epoch(manifest_path, preflight_path, directory, epoch, *, device):
+    from .state import load_training_state
     from .validation import run_validation
     run = run_path(directory)
     spec, records, _ = audit_run(run)

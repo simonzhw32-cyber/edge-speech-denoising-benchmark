@@ -40,9 +40,33 @@ Data and external nohup logs are not included in that archive.
 
 Training and evaluation used uncommitted changes based on 6c2c965.
 Source hashes in the historical records identify those exact files.
-Committing does not change those historical records. The current resume logic
+Committing does not change those historical records. The original Release-tag resume logic
 also compares Git metadata, so resuming after a commit may be rejected.
+The updated runner ignores Git-only changes, but still rejects changed training
+sources; it does not silently migrate this historical run.
 Do not edit old run metadata to bypass this check.
 
 Next: extend the real training/evaluation workflow to LiSenNet and six-layer
 TF-GridNet, with an agreed experimental budget.
+
+## Restore the original evaluation
+
+Use a separate clean checkout of `gtcrn-seed42-pilot-25ep` and install the desired
+Torch build first. Download the Release archive and `archive.sha256` to that
+checkout. In a Linux terminal:
+
+```sh
+sha256sum -c archive.sha256
+tar -xzf gtcrn_seed42_epoch25_20261005_204146.tar.gz
+python -m pip install -e . -r requirements-evaluation.txt
+python -m scripts.prepare_data --split test
+python -m scripts.evaluate_trained \
+  --run-dir results/training_runs/gtcrn_random_seed42 \
+  --manifest data/voicebank-demand-16k/test_manifest.json \
+  --output results/trained_reports/gtcrn_seed42_replay_test824.json \
+  --device cuda --metrics pesq stoi si_snr si_snr_improvement --threads 4
+```
+
+The archive excludes audio. Keep existing historical test reports; the replay
+writes a new filename. Exact numeric reproducibility also depends on the recorded
+runtime/backend, not just the checkpoint hash.

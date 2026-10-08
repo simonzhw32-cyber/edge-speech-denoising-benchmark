@@ -1,0 +1,28 @@
+name: Training smoke checks
+on:
+  pull_request:
+  push:
+    branches: [main, feature/lisennet-real-training]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  cpu-fixtures:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install CPU fixture dependencies
+        run: |
+          python -m pip install torch==2.8.0 --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -e . -r requirements-benchmark.txt
+      - name: Check real-run routing, resume and generated LiSenNet updates
+        run: python -m scripts.smoke_real_training
+      - name: Check shared loss, state and synthetic GTCRN regression
+        run: |
+          python -m scripts.smoke_training_components
+          python -m scripts.smoke_training_state
+          python -m scripts.smoke_training_runner

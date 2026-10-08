@@ -1,11 +1,15 @@
 # Requirements and acceptance status
 
-Review baseline: `6c2c965`, 2026-10-04
+Original review baseline: `6c2c965`, 2026-10-04
 (Asia/Shanghai). This review reads the actual repository, including committed
 benchmark and training-resource reports. No `AGENTS.md` or teacher-authored
 acceptance checklist is present in this snapshot. The requirements below are
 the user's project instructions and relayed group workflow. Draft hyperparameters
 and engineering tests are not additional requirements attributed to the group.
+
+Current update: the GTCRN seed-42 25-epoch pilot is archived at `ae846dd`.
+GTCRN/LiSenNet real execution is implemented; LiSenNet real-data execution is
+pending. This update does not mark a three-model comparison complete.
 
 ## Coverage and acceptance criteria
 
@@ -16,10 +20,10 @@ and engineering tests are not additional requirements attributed to the group.
 | R3 | Pinned public dataset, fixed test and reproducible validation from train | Implemented in preparation/planning | `configs/voicebank.json`, manifests, speaker-disjoint plan and complete train-audio preflight |
 | R4 | Common PESQ-WB, STOI, SI-SNR, improvement, RTF and parameter counts | Complete for two pretrained baselines | Both full 824-item JSON reports include four quality metrics, full coverage and zero failures |
 | R5 | Explain three-model baseline availability and training provenance | Partial | LiSenNet checkpoint provenance remains unresolved; do not assign a random-weight score as its pretrained baseline |
-| R6 | Separate training and validation entry points with resumable state | Implemented for GTCRN; execution pending | `scripts/train.py --real` updates from verified VoiceBank train data and saves state; `scripts.validate --real` restores it and performs independent held-out validation |
+| R6 | Separate training and validation entry points with resumable state | GTCRN pilot complete; LiSenNet execution pending | `scripts/train.py --real` supports GTCRN and random LiSenNet from verified VoiceBank train data and saves state; `scripts.validate --real` restores it and performs independent held-out validation |
 | R7 | Controlled comparison under a recorded shared training protocol | Pending | Random initialization, shared split/loss/exposure and seeds; selected checkpoints and full test reports after real runs |
 | R8 | On-board profiling / edge deployment evidence | Pending | Record agreed target hardware, runtime, model/profile, precision, workload, latency and memory; desktop RTF is not on-board profiling |
-| R9 | Repository visibility follows group agreement | Private required; unchanged here | Keep the repository private and invite only the designated group members; this implementation does not change visibility or invitations |
+| R9 | Repository visibility follows group agreement | Group requested private; owner made public on 2026-10-08 | Record the actual public state separately from the earlier group preference; reconcile publication scope with the group |
 
 R7's proposed settings live in [training_protocol.md](training_protocol.md) and
 `configs/training_protocol.yaml`: seeds 42/43/44, four-second crops, batch four,
@@ -79,6 +83,11 @@ for the recorded GPU environment and new-machine setup.
 
 ## Continue from this baseline
 
+GTCRN already completed steps 2–5 below for a single seed and a 25-epoch pilot.
+Use a new LiSenNet run for the next integration check; do not restart GTCRN or
+continue it automatically just because the draft configuration allows 100 epochs.
+
+
 1. Restore the checkout and the intended interpreter. Restore local train data
    only if absent; old absolute paths in archived reports are not portable.
 2. Choose random initialization or pinned-checkpoint fine-tuning and approve a
@@ -102,9 +111,10 @@ fingerprints, optimizer settings, precision/backend flags, completed epochs and
 steps, selection evidence and checkpoint hash. Preserve partial/failed runs as
 such; do not merge them into a completed experiment.
 
-The current `train.py` and `validate.py` expose guarded real GTCRN execution, but
-no real trained checkpoint, convergence curve or final controlled comparison
-exists at this baseline.
+The current `train.py` and `validate.py` expose guarded GTCRN/LiSenNet execution.
+The GTCRN pilot has checkpoints, a 25-epoch learning curve, independent selection
+and a complete fixed-test report. LiSenNet and six-layer TF-GridNet do not yet
+have matched real-data results, and R7 remains pending.
 
 ## Materials to retain
 
@@ -119,3 +129,10 @@ environments, weights, generated results or future training checkpoints. Once
 training starts, back up learned weights separately from code and archive hashes
 and run metadata with the result. Copies of environments must be recreated on
 new machines; archived probe launchers remain historical diagnostics.
+
+
+## LiSenNet pilot completed — 2026-10-08
+
+LiSenNet random seed 42 completed 25 real training epochs and 25 independent validations. Validation selected epoch 21; all 824 fixed test utterances were evaluated with PESQ, STOI, SI-SNR and SI-SNR improvement. See [experiment results](lisennet_seed42_pilot.md).
+
+This update supersedes earlier statements that LiSenNet real execution is pending. TF-GridNet real training and a complete three-model comparison remain pending; edge-device efficiency is not established.
