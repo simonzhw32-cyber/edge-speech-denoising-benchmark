@@ -46,7 +46,7 @@ def validate_spec(spec):
     plan = spec.get("plan")
     if not isinstance(plan, dict) or fingerprint(plan) != spec.get("plan_sha256"):
         raise ValueError("Run plan fingerprint differs")
-    if (spec.get("model") not in ("gtcrn", "lisennet") or
+    if (spec.get("model") not in ("gtcrn", "lisennet", "tfgridnet") or
             plan.get("model") != spec["model"] or identity.get("model") != spec["model"]):
         raise ValueError("Run, plan and identity must name the same supported model")
     train_ids = plan.get("split", {}).get("train_ids")
@@ -65,6 +65,18 @@ def validate_spec(spec):
         raise ValueError("Run settings differ from the bound training plan")
     if settings.get("device") not in ("cpu", "cuda") or type(settings.get("deterministic_algorithms")) is not bool:
         raise ValueError("Run device and deterministic mode must be explicit")
+    accumulation = {"micro_batch_size": 1, "gradient_accumulation_steps": 4,
+                    "accumulation_reduction": "actual_group_utterance_mean"}
+    if spec["model"] == "tfgridnet":
+        if settings.get("batch_size") != 4 or any(
+                settings.get(key) != value or type(settings.get(key)) is not type(value)
+                for key, value in accumulation.items()):
+            raise ValueError("TF-GridNet requires explicit micro-batch 1 and accumulation 4")
+        if (identity["profile"] != "local_6layer" or
+                plan["model_settings"]["constructor_kwargs"].get("n_layers") != 6):
+            raise ValueError("Use the original six-layer TF-GridNet profile")
+    elif any(key in settings for key in accumulation):
+        raise ValueError("Accumulation settings are reserved for the TF-GridNet run")
     initialization = spec.get("initialization", {})
     if initialization.get("mode") not in ("random", "pretrained"):
         raise ValueError("Initialization must be random or pretrained")

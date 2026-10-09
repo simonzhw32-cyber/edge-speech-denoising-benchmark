@@ -1,4 +1,4 @@
-"""Evaluate the validation-selected GTCRN/LiSenNet checkpoint on the fixed test split."""
+"""Evaluate the validation-selected GTCRN/LiSenNet/TF-GridNet checkpoint on the fixed test split."""
 
 import argparse
 import hashlib
@@ -142,8 +142,9 @@ def main(argv=None):
     best = selection.get("best")
     if not best or not reports or best["epoch"] > len(records):
         raise ValueError("The run has no complete validation-only checkpoint selection")
-    if spec["model"] not in ("gtcrn", "lisennet") or spec["identity"]["profile"] != "native_default":
-        raise ValueError("Trained evaluation currently supports native GTCRN/LiSenNet profiles only")
+    expected_profile = "local_6layer" if spec["model"] == "tfgridnet" else "native_default"
+    if spec["model"] not in ("gtcrn", "lisennet", "tfgridnet") or spec["identity"]["profile"] != expected_profile:
+        raise ValueError("Unsupported trained model/profile")
     verify_run_sources(spec)
     checkpoint = checkpoint_path(run, best["epoch"])
     if selection.get("checkpoint") != str(checkpoint.relative_to(run)):

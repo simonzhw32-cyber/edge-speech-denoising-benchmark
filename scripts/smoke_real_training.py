@@ -100,7 +100,10 @@ def metadata_checks(folder):
     names = source_files("lisennet")
     assert "speech_denoising/models/lisennet/dpr_layer.py" in names
     assert not any("models/gtcrn/" in name for name in names)
-    rejected(lambda: source_files("tfgridnet"))
+    tf_names = source_files("tfgridnet")
+    assert "speech_denoising/training/accumulation.py" in tf_names
+    assert all((REPO_ROOT / name).is_file() for name in tf_names)
+    rejected(lambda: source_files("unsupported"))
     from speech_denoising.training import real_runner
     from speech_denoising.training.probe import source_hashes
     current = tiny_spec(model="lisennet")

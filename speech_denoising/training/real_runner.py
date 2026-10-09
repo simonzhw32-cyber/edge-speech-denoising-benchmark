@@ -34,11 +34,17 @@ def source_files(model):
     """Fingerprint the selected architecture and shared execution code."""
     if model == "gtcrn":
         return list(SOURCE_FILES)
-    if model != "lisennet":
-        raise ValueError("Real training supports GTCRN and LiSenNet only")
+    if model not in ("lisennet", "tfgridnet"):
+        raise ValueError("Unsupported real-training model")
     names = [name for name in SOURCE_FILES
              if name not in ("configs/gtcrn.yaml", "speech_denoising/assets/gtcrn.py")
              and not name.startswith("speech_denoising/models/gtcrn/")]
+    if model == "tfgridnet":
+        return names + ["configs/tfgridnet.yaml",
+                        "speech_denoising/models/tfgridnet/model.py",
+                        "speech_denoising/models/tfgridnet/network.py",
+                        "speech_denoising/models/tfgridnet/spectral.py",
+                        "speech_denoising/training/accumulation.py"]
     return names + ["configs/lisennet.yaml", "speech_denoising/models/lisennet/model.py",
                     "speech_denoising/models/lisennet/network.py",
                     "speech_denoising/models/lisennet/dpr_layer.py"]
@@ -52,8 +58,11 @@ def build_training_model(spec):
     elif model == "lisennet":
         from speech_denoising.models.lisennet.model import LiSenNetModel
         constructor = LiSenNetModel
+    elif model == "tfgridnet":
+        from speech_denoising.models.tfgridnet.model import TFGridNetModel
+        constructor = TFGridNetModel
     else:
-        raise ValueError("Real execution supports GTCRN and LiSenNet only")
+        raise ValueError("Unsupported real-execution model")
     return constructor(**spec["plan"]["model_settings"]["constructor_kwargs"])
 
 
@@ -106,8 +115,8 @@ def _runtime(device, deterministic):
 def build_run_spec(manifest_path, preflight_path, *, seed, device, initialization,
                    initial_checkpoint=None, deterministic_algorithms=False, model="gtcrn"):
     source_files(model)
-    if model == "lisennet" and (initialization != "random" or initial_checkpoint is not None):
-        raise ValueError("LiSenNet real training supports random initialization only")
+    if model in ("lisennet", "tfgridnet") and (initialization != "random" or initial_checkpoint is not None):
+        raise ValueError("LiSenNet and TF-GridNet support random initialization only")
     path, data, _, plan, preflight_bytes = bind_preflight(manifest_path, preflight_path, model)
     checkpoint_sha256 = None
     initialization_record = {"mode": initialization, "checkpoint_source": None,
@@ -129,6 +138,11 @@ def build_run_spec(manifest_path, preflight_path, *, seed, device, initializatio
         "segment_samples", "batch_size", "epochs", "optimizer", "learning_rate",
         "weight_decay", "betas", "gradient_clip_norm", "precision")}
     settings.update(device=device, deterministic_algorithms=deterministic_algorithms)
+    if model == "tfgridnet":
+        if settings["batch_size"] != 4:
+            raise ValueError("TF-GridNet accumulation requires the draft effective batch of 4")
+        settings.update(micro_batch_size=1, gradient_accumulation_steps=4,
+                        accumulation_reduction="actual_group_utterance_mean")
     return {
         "schema_version": 1, "scope": "real_voicebank_training", "model": model,
         "purpose": ("unified_training_from_scratch" if initialization == "random"
@@ -217,6 +231,9 @@ def train_real_epoch(manifest_path, preflight_path, directory, epoch, *, seed, d
         step = progress["global_step"]
     else:
         create_run(run, spec)
+    if spec["model"] == "tfgridnet":
+        from .accumulation import train_accumulated_epoch
+        train_one_epoch = train_accumulated_epoch
     summary = train_one_epoch(model, optimizer, dataset, dataset.utterance_ids,
                               seed=seed, epoch=epoch, settings=spec["settings"], global_step=step)
     digest = save_training_state(checkpoint_path(run, epoch), model, optimizer, spec["identity"],

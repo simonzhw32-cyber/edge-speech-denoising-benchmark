@@ -1,0 +1,29 @@
+{
+  "best": {
+    "checkpoint_sha256": "f792e4e9882e2b6717f0898f73f1d2beaa65391d464632efa27acc87e631f9b1",
+    "count": 794,
+    "epoch": 5,
+    "identity": {
+      "initial_checkpoint_sha256": null,
+      "initialization": "random",
+      "model": "tfgridnet",
+      "model_settings_sha256": "ab692ef3e1e908741935c5287a36cfbfcf0472a3bfbedb39868ca7728822c3de",
+      "profile": "local_6layer",
+      "protocol_sha256": "4a7242c5363d4a342c7cc96edc65f764bb0106f6e2a4f62c158e8dd5e5ff7305",
+      "seed": 42,
+      "split_sha256": "0a1ebb0028dfa7d4a5c7971636e54a7a14576d13d8a0760537e1668361f5d220"
+    },
+    "loss": "negative_si_snr",
+    "mean_loss": -15.801807321138886,
+    "reduction": "utterance_mean",
+    "schema_version": 1,
+    "scope": "complete_train_validation",
+    "validation_ids_sha256": "75d36d7ebcc9deadf8eea2fc8860066e1e53a1504af27b92f567140d30bda82e"
+  },
+  "checkpoint": "checkpoints/epoch_0005.pt",
+  "reports_sha256": "3665ee997a27bb601a268741df4dcccba3e9e97be9e6541bc921a78024b9a335",
+  "schema_version": 1,
+  "scope": "real_voicebank_training",
+  "spec_sha256": "2e9fc6706bdfca92f991010b2a0f09261aaaedfc0c868e43e0b14c487e8ed857",
+  "validated_epochs": 5
+}

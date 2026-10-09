@@ -1,4 +1,4 @@
-"""Describe training or execute one synthetic or verified VoiceBank GTCRN/LiSenNet epoch."""
+"""Describe training or execute one synthetic or verified VoiceBank GTCRN/LiSenNet/TF-GridNet epoch."""
 
 import argparse
 import json
@@ -10,7 +10,7 @@ def main():
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--describe", action="store_true")
     mode.add_argument("--fixture", action="store_true", help="CPU random-GTCRN synthetic updates only")
-    mode.add_argument("--real", action="store_true", help="Verified VoiceBank GTCRN/LiSenNet training")
+    mode.add_argument("--real", action="store_true", help="Verified VoiceBank GTCRN/LiSenNet/TF-GridNet training")
     parser.add_argument("--model", choices=("gtcrn", "lisennet", "tfgridnet"), default="gtcrn")
     parser.add_argument("--run-dir", type=Path)
     parser.add_argument("--epoch", type=int)
@@ -36,7 +36,7 @@ def main():
             print(json.dumps({"status": "draft", "execution_ready": False, "model": args.model,
                               "model_settings": model_settings(protocol, args.model),
                               "execution_scope": ("verified_real_training_available"
-                                                  if args.model in ("gtcrn", "lisennet")
+                                                  if args.model in ("gtcrn", "lisennet", "tfgridnet")
                                                   else "synthetic_fixture_only")},
                              indent=2, allow_nan=False))
             return
@@ -53,11 +53,11 @@ def main():
             return
         required = (args.run_dir, args.epoch, args.manifest, args.preflight,
                     args.device, args.initialization)
-        if args.model not in ("gtcrn", "lisennet") or any(value is None for value in required):
-            parser.error("--real requires GTCRN or LiSenNet, --manifest, --preflight, --run-dir, "
+        if args.model not in ("gtcrn", "lisennet", "tfgridnet") or any(value is None for value in required):
+            parser.error("--real requires GTCRN, LiSenNet or TF-GridNet, --manifest, --preflight, --run-dir, "
                          "--epoch, --device and --initialization")
-        if args.model == "lisennet" and args.initialization != "random":
-            parser.error("LiSenNet supports --initialization random only")
+        if args.model in ("lisennet", "tfgridnet") and args.initialization != "random":
+            parser.error("LiSenNet and TF-GridNet support --initialization random only")
         if (args.initialization == "pretrained") != (args.initial_checkpoint is not None):
             parser.error("--pretrained requires --initial-checkpoint; --random forbids it")
         from speech_denoising.training.real_runner import train_real_epoch
