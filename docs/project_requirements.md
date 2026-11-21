@@ -7,9 +7,16 @@ acceptance checklist is present in this snapshot. The requirements below are
 the user's project instructions and relayed group workflow. Draft hyperparameters
 and engineering tests are not additional requirements attributed to the group.
 
-Current update: the GTCRN seed-42 25-epoch pilot is archived at `ae846dd`.
-GTCRN/LiSenNet real execution is implemented; LiSenNet real-data execution is
-pending. This update does not mark a three-model comparison complete.
+Current update (2026-11-09): GTCRN, LiSenNet and TF-GridNet have each completed
+a 25-epoch unified-recipe seed-42 pilot on the same speaker-disjoint split, so
+the three-model comparison is complete for that pilot budget. A separate
+LiSenNet paper-recipe run (100 epochs, 2 s crops, AdamW 5e-4, StepLR 0.98,
+PESQ-conditioned GAN loss) is in progress. GTCRN has no paper-defined VCTK epoch
+count, and TF-GridNet's paper does not use VoiceBank-DEMAND; see
+[paper alignment](paper_alignment.md). Edge-device efficiency remains open.
+GTCRN's paper track is implemented with 15 checks but has no real run because
+the paper gives no VCTK epoch budget; TF-GridNet has no paper track because its
+paper has no VoiceBank-DEMAND recipe.
 
 ## Coverage and acceptance criteria
 
@@ -20,7 +27,7 @@ pending. This update does not mark a three-model comparison complete.
 | R3 | Pinned public dataset, fixed test and reproducible validation from train | Implemented in preparation/planning | `configs/voicebank.json`, manifests, speaker-disjoint plan and complete train-audio preflight |
 | R4 | Common PESQ-WB, STOI, SI-SNR, improvement, RTF and parameter counts | Complete for two pretrained baselines | Both full 824-item JSON reports include four quality metrics, full coverage and zero failures |
 | R5 | Explain three-model baseline availability and training provenance | Partial | LiSenNet checkpoint provenance remains unresolved; do not assign a random-weight score as its pretrained baseline |
-| R6 | Separate training and validation entry points with resumable state | GTCRN pilot complete; LiSenNet execution pending | `scripts/train.py --real` supports GTCRN and random LiSenNet from verified VoiceBank train data and saves state; `scripts.validate --real` restores it and performs independent held-out validation |
+| R6 | Separate training and validation entry points with resumable state | Implemented; three 25-epoch pilots complete | `scripts/train.py --real` supports GTCRN, LiSenNet and TF-GridNet from verified VoiceBank train data and saves state; `scripts.validate --real` restores it and performs independent held-out validation |
 | R7 | Controlled comparison under a recorded shared training protocol | Pending | Random initialization, shared split/loss/exposure and seeds; selected checkpoints and full test reports after real runs |
 | R8 | On-board profiling / edge deployment evidence | Pending | Record agreed target hardware, runtime, model/profile, precision, workload, latency and memory; desktop RTF is not on-board profiling |
 | R9 | Repository visibility follows group agreement | Group requested private; owner made public on 2026-10-08 | Record the actual public state separately from the earlier group preference; reconcile publication scope with the group |
@@ -84,16 +91,19 @@ for the recorded GPU environment and new-machine setup.
 ## Continue from this baseline
 
 GTCRN already completed steps 2–5 below for a single seed and a 25-epoch pilot.
-Use a new LiSenNet run for the next integration check; do not restart GTCRN or
-continue it automatically just because the draft configuration allows 100 epochs.
+For the GTCRN paper track, first obtain an operator epoch/segment budget; the
+unified 25-epoch pilot is already complete. Use the LiSenNet paper run for the
+next integration check; do not restart GTCRN or continue it automatically just
+because the draft configuration allows 100 epochs.
 
 
 1. Restore the checkout and the intended interpreter. Restore local train data
    only if absent; old absolute paths in archived reports are not portable.
 2. Choose random initialization or pinned-checkpoint fine-tuning and approve a
    small first-run resource budget; these are distinct experiments.
-3. Run **one real GTCRN epoch**, then all 794 held-out validation utterances,
-   using the implemented separate entry points.
+3. For the GTCRN paper track, run **one real GTCRN epoch** only after an
+   operator supplies `--epochs` and `--segment-seconds`; then run all 794
+   held-out validation utterances.
    Save epoch state, optimizer/RNG state, loss history and checkpoint selection.
    Check epoch-boundary resume before starting the longer run. This first epoch
    is an integration/stability check, not a final baseline result.
@@ -111,10 +121,12 @@ fingerprints, optimizer settings, precision/backend flags, completed epochs and
 steps, selection evidence and checkpoint hash. Preserve partial/failed runs as
 such; do not merge them into a completed experiment.
 
-The current `train.py` and `validate.py` expose guarded GTCRN/LiSenNet execution.
-The GTCRN pilot has checkpoints, a 25-epoch learning curve, independent selection
-and a complete fixed-test report. LiSenNet and six-layer TF-GridNet do not yet
-have matched real-data results, and R7 remains pending.
+The current `train.py` and `validate.py` expose guarded GTCRN, LiSenNet and
+TF-GridNet execution. All three 25-epoch seed-42 pilots have checkpoints,
+learning curves, independent selection and complete fixed-test reports. The
+LiSenNet paper-recipe run is a separate track and does not replace the unified
+comparison. R7 remains pending because the controlled comparison still needs the
+remaining seeds and its own acceptance record.
 
 ## Materials to retain
 
@@ -135,4 +147,7 @@ new machines; archived probe launchers remain historical diagnostics.
 
 LiSenNet random seed 42 completed 25 real training epochs and 25 independent validations. Validation selected epoch 21; all 824 fixed test utterances were evaluated with PESQ, STOI, SI-SNR and SI-SNR improvement. See [experiment results](lisennet_seed42_pilot.md).
 
-This update supersedes earlier statements that LiSenNet real execution is pending. TF-GridNet real training and a complete three-model comparison remain pending; edge-device efficiency is not established.
+As of 2026-10-08, this update superseded earlier statements that LiSenNet real
+execution is pending. It is itself superseded by the 2026-11-09 update above:
+the TF-GridNet 25-epoch pilot is complete and the three-model pilot comparison
+exists; edge-device efficiency is not established.

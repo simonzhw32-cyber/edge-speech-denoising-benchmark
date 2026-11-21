@@ -1,5 +1,7 @@
 # Install the base package first; these dependencies support data and metrics.
 soundfile>=0.12
 pyarrow>=14
+# Fallback parquet reader when a pyarrow wheel cannot load on Windows.
+duckdb>=1.0
 pystoi>=0.4
 # Optional PESQ (C compiler required): python -m pip install pesq==0.0.4

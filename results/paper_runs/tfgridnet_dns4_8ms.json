@@ -1,0 +1,51 @@
+{
+  "config": "configs/tfgridnet_dns.yaml",
+  "profile": "dns_ins20_epoch33",
+  "parameters": 2552790,
+  "hop_ms": 8.0,
+  "amp": "fp16",
+  "steps": 20,
+  "rows": [
+    {
+      "amp": "fp16",
+      "checkpoint_blocks": 0,
+      "config": "configs/tfgridnet_dns.yaml",
+      "hop_ms": 8.0,
+      "loss_first": 1.2147966623306274,
+      "loss_last": 1.005221962928772,
+      "parameters": 2552790,
+      "peak_alloc_gib": 2.16843843460083,
+      "peak_reserved_gib": 2.763671875,
+      "policy": "dns4_none",
+      "status": "ok",
+      "step_seconds": 0.1730472250003004,
+      "step_seconds_max": 0.18019690000073751,
+      "step_seconds_min": 0.1699761000018043,
+      "steps": 20,
+      "stride": 128
+    },
+    {
+      "amp": "fp16",
+      "checkpoint_blocks": 0,
+      "config": "configs/tfgridnet_dns.yaml",
+      "hop_ms": 8.0,
+      "loss_first": 1.2147966623306274,
+      "loss_last": 1.005221962928772,
+      "parameters": 2552790,
+      "peak_alloc_gib": 1.6302928924560547,
+      "peak_reserved_gib": 2.271484375,
+      "policy": "dns4_attn",
+      "status": "ok",
+      "step_seconds": 0.18893735500023467,
+      "step_seconds_max": 0.20205170000190265,
+      "step_seconds_min": 0.18282730000282754,
+      "steps": 20,
+      "stride": 128,
+      "subblock": {
+        "attention": true,
+        "inter": false,
+        "intra": false
+      }
+    }
+  ]
+}

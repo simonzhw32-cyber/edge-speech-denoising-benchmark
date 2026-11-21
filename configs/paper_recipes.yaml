@@ -1,0 +1,90 @@
+# Paper recipes, kept separate from the unified benchmark protocol.
+#
+# This file is reference metadata only. The executable benchmark stays on
+# configs/training_protocol.yaml so cross-model numbers remain comparable.
+# Values below are transcribed from the papers (and the pinned official code
+# where the paper is silent); see docs/paper_alignment.md for provenance.
+
+schema_version: 1
+status: reference_only
+
+models:
+  gtcrn:
+    paper: "GTCRN: A Speech Enhancement Model Requiring Ultralow Computational Resources"
+    venue: "ICASSP 2024, pp. 971-975"
+    doi: "10.1109/ICASSP48485.2024.10448310"
+    official_code: "Xiaobin-Rong/gtcrn@502ebfab64da7c4a9af78dcb9c6ceef1ebb01c73"
+    dataset: "VCTK-DEMAND, 16 kHz, 11,572 train / 824 test"
+    stft:
+      window: "sqrt-Hann"
+      win_length_ms: 32
+      hop_length_ms: 16
+      n_fft: 512
+      hop_length: 256
+    batch_size_vctk: 4
+    batch_size_dns3: 16
+    optimizer: "Adam"
+    learning_rate: 0.001
+    lr_schedule: "halve when validation loss does not decrease for 5 epochs"
+    loss:
+      formula: "alpha * L_SISNR + (1 - beta) * L_mag + beta * (L_real + L_imag)"
+      alpha: 0.01
+      beta: 0.3
+      magnitude_power: 0.3
+      ri_normalization_power: 0.7
+    epochs_vctk: null
+    notes: >-
+      The paper states no VCTK epoch count, segment length, or weight decay.
+      The DNS3 recipe chunks utterances to 8 s and samples 40,000 pairs per
+      epoch; those values do not apply to VCTK-DEMAND.
+
+  lisennet:
+    paper: "LiSenNet: Lightweight Speech Enhancement Network on Raspberry Pi"
+    arxiv: "2409.13285"
+    official_code: "hyyan2k/LiSenNet@df4e481aa706fbc344d1013f7a1cbfd46228c8ab"
+    dataset: "VoiceBank+DEMAND, 16 kHz, 11,572 train / 872 test (paper)"
+    stft:
+      window: "Hann"
+      win_length_ms: 32
+      hop_length_ms: 16
+      n_fft: 512
+      hop_length: 256
+    segment_samples: 32000
+    segment_seconds: 2.0
+    batch_size: 4
+    optimizer: "AdamW"
+    learning_rate: 0.0005
+    betas: [0.8, 0.99]
+    weight_decay: 0.0
+    lr_schedule: "StepLR, step_size=1, gamma=0.98"
+    gradient_clip_norm: 5.0
+    epochs: 100
+    loss:
+      magnitude: 0.9
+      complex: 0.1
+      adversarial: 0.05
+      discriminator_target: "PESQ rescaled to (0, 1)"
+    generator_parameters: 36783
+
+  tfgridnet:
+    paper: "TF-GridNet: Integrating Full- and Sub-Band Modeling for Speech Separation"
+    arxiv: "2211.12433"
+    dataset_note: "Paper training recipe; repository run uses VoiceBank-DEMAND."
+    stft:
+      window: "sqrt-Hann"
+      win_length_ms: 32
+      hop_length_ms: 8
+      n_fft: 512
+      hop_length: 128
+      frequency_bins: 257
+    segment_seconds: 4.0
+    sample_variance_normalization: 1.0
+    optimizer: "Adam"
+    learning_rate: 0.001
+    lr_schedule: "halve when validation loss does not improve for 3 epochs"
+    gradient_clip_norm: 1.0
+    dynamic_mixing: false
+    epochs: null
+    epochs_note: >-
+      The paper does not state a total epoch count; it reports 20,000 4-second
+      segments per epoch in its training-speed table.

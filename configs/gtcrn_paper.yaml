@@ -1,0 +1,62 @@
+# GTCRN paper-recipe training track (ICASSP 2024).
+#
+# Reference-only sibling of the unified benchmark: nothing in scripts/train.py,
+# training/protocol.py or training/real_runner.py reads this file, and
+# configs/gtcrn.yaml is untouched. Read by
+# speech_denoising/training/paper_gtcrn.py via utils.load_config (extends-aware).
+extends: gtcrn.yaml
+
+paper_track:
+  reference:
+    paper: "GTCRN: A Speech Enhancement Model Requiring Ultralow Computational Resources"
+    venue: "ICASSP 2024, pp. 971-975"
+    doi: "10.1109/ICASSP48485.2024.10448310"
+    official_code: "Xiaobin-Rong/gtcrn@502ebfab64da7c4a9af78dcb9c6ceef1ebb01c73"
+    dataset: "VCTK-DEMAND, 16 kHz, 11,572 train / 824 test"
+
+  # --- defined by the paper ---
+  sample_rate: 16000
+  n_fft: 512
+  hop_length: 256
+  window: sqrt_hann
+  batch_size: 4
+  optimizer: Adam
+  learning_rate: 0.001
+  scheduler:
+    type: ReduceLROnPlateau
+    mode: min
+    factor: 0.5
+    patience: 5
+    threshold: 0.0001
+    threshold_mode: rel
+    cooldown: 0
+    min_lr: 0.0
+  loss:
+    alpha: 0.01
+    beta: 0.3
+    magnitude_power: 0.3
+    ri_power: 0.7
+    mag_eps: 1.0e-12
+    sisnr_eps: 1.0e-8
+    scale: paper          # "paper" = 0.01/0.7/0.3 | "official_x100" = released code
+
+  # --- NOT defined by the paper: null means "must come from the CLI" ---
+  epochs: null
+  segment_seconds: null
+  grad_clip_norm: null
+  weight_decay: 0.0
+  betas: [0.9, 0.999]
+  adam_eps: 1.0e-8
+
+  # --- repository decisions, recorded as such in run.json ---
+  train_pool: paper_full          # paper_full = 11,572 | held_out = 10,778
+  validation:
+    split: repository_held_out_794
+    batch_size: 1
+    segment: full
+    purpose: scheduler_monitor_only
+  checkpoint:
+    every_epoch: true
+    selection: last
+  results_root: results/paper_runs
+  seed: 42

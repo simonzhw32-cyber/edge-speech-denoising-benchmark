@@ -1,0 +1,86 @@
+{
+  "results/paper_runs/tfgridnet_pareto_8ms_fp16.json": {
+    "sha256": "17e858599bf1a5cff50c610321d21f221d21308b8c192529b9453d134d748666",
+    "bytes": 5862
+  },
+  "results/paper_runs/tfgridnet_pareto_8ms_fp16.svg": {
+    "sha256": "1cca16a61e3b873b1e85b25fa1e76ef943f86255bbb6d77b335b6bb11afc6190",
+    "bytes": 4542
+  },
+  "results/paper_runs/tfgridnet_pareto_8ms_fp16.png": {
+    "sha256": "ce3089ccaeb739933a8915adbbe61b6633d48cf2aea58a6c98f88d0824e2bbad",
+    "bytes": 24753
+  },
+  "results/paper_runs/tfgridnet_dns4_8ms.json": {
+    "sha256": "e14c4345b9278180b797cf92d7b7e0195baf8f5bd6440b302407a7b97d402ad7",
+    "bytes": 1417
+  },
+  "results/paper_runs/tfgridnet_quality.svg": {
+    "sha256": "b7f420d60d17bcaad96b28b80313f27f0d212619fab280921fc053765474ac5c",
+    "bytes": 2993
+  },
+  "results/paper_runs/tfgridnet_quality.png": {
+    "sha256": "6a7224cf80a4815af873e1d2faa23cb10b36e934feb45c20ea703a1e6ac2ed60",
+    "bytes": 25918
+  },
+  "results/paper_runs/tfgridnet_policy_proxy/quality_equivalence_200.json": {
+    "sha256": "03a0ecdaad550ffbd9b8f568bf1f00ace2e2dec69caed1b5a8f10e24553d0729",
+    "bytes": 2430
+  },
+  "results/paper_runs/tfgridnet_policy_proxy/quality_equivalence_100.json": {
+    "sha256": "b0c8a15b4fb1c0191b92aa1466687ba7703d91294932d31af2fc77d9fd9d9a96",
+    "bytes": 721
+  },
+  "results/paper_runs/tfgridnet_policy_proxy/quality_equivalence_1000.json": {
+    "sha256": "357e531e03e29fd9de2e5b341193bed03a6b70040829ee49931028259dce212b",
+    "bytes": 4172
+  },
+  "results/paper_runs/tfgridnet_policy_proxy/precision_equivalence_200.json": {
+    "sha256": "5bb13ad3c99b090bf055b634835409d4cbd3fab1da2b4b5c2351ccf463016743",
+    "bytes": 2587
+  },
+  "results/paper_runs/tfgridnet_policy_proxy/timing_analysis.json": {
+    "sha256": "c0c12aa00ba95d547d3ed0912326a8d31f901c52bb8dea545fe3986c4f11bebb",
+    "bytes": 650
+  },
+  "results/paper_runs/tfgridnet_policy_proxy/timing_controls.json": {
+    "sha256": "60f8aa0ad77234cb920a470e95a31c179eacb7eb1fcf5884ef0239f5bae6aff6",
+    "bytes": 655
+  },
+  "results/paper_runs/tfgridnet_policy_proxy/final_summary.md": {
+    "sha256": "3751b13d3a1aee7f0da279ae697fec5480ca1b8fc545bc51c653cf5e755660a0",
+    "bytes": 2620
+  },
+  "results/paper_runs/tfgridnet_policy_proxy/experiment_matrix.json": {
+    "sha256": "14f4d08f9e4122d7f2945c82f99f797c6040816d272df5e6fe3fb4d47659241b",
+    "bytes": 1992
+  },
+  "docs/tfgridnet_paper_draft.md": {
+    "sha256": "ab5506de139f7bf117e0b876fa2667d7e7056535532323dc2b4b26e4ff32f3c0",
+    "bytes": 25113
+  },
+  "docs/tfgridnet_memory_policy_bench.md": {
+    "sha256": "ddf3499f977173ca6f57688c750644e4c63a9d39b71326ac31a2e76879beaae5",
+    "bytes": 11985
+  },
+  "docs/tfgridnet_reproduce.md": {
+    "sha256": "741ec585d0c0a42a8fbf829c81e67422c7beeb81472be5bb7a7570bb5abe9fb2",
+    "bytes": 5861
+  },
+  "docs/tfgridnet_submission_checklist.md": {
+    "sha256": "101593db483d5c171c5603801bca41c5e00dff880063a2c58701a7ac995c4908",
+    "bytes": 3685
+  },
+  "docs/tfgridnet_paper_plan.md": {
+    "sha256": "b8e18ace22e8071c35707e671ba4c58d3546bb14c2978ac81c9e3a7e55493a5a",
+    "bytes": 9433
+  },
+  "docs/tfgridnet_reviewer_faq.md": {
+    "sha256": "58cce2942f511085a4fc2cbcc08ff11dfc13290275cb9389a38dddf94d2e7a3c",
+    "bytes": 3393
+  },
+  "docs/tfgridnet_experiment_matrix.md": {
+    "sha256": "d351c8a1c84f66266d04aa4130eb804bf4d6c29eeb12adc0a64e72f4f8f46f39",
+    "bytes": 1848
+  }
+}

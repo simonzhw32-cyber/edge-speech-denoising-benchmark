@@ -24,6 +24,24 @@ DNS 2020 recipe. Training data, budgets and selection procedures are not matched
 Exact DNS training manifests remain unavailable, including independent proof of
 non-overlap with VoiceBank. Treat these as descriptive pretrained baselines.
 
+## Local 25-epoch pilots
+
+These rows use the repository's unified recipe: speaker-disjoint split
+(10,778 train / 794 validation), 4 s crops, batch 4, AdamW 1e-3, negative SI-SNR,
+25 epochs, seed 42. They are comparable to each other but not to the pretrained
+rows above. TF-GridNet used gradient accumulation 4 with micro-batch 1.
+
+| Model | Selected epoch | PESQ-WB | STOI | SI-SNR (dB) | Improvement (dB) |
+|---|---:|---:|---:|---:|---:|
+| GTCRN | 24 | 2.57246 | 0.93428 | 18.70302 | 10.25748 |
+| LiSenNet | 21 | 2.57229 | 0.93443 | 18.63120 | 10.18566 |
+| TF-GridNet 6-layer | 23 | 2.79501 | 0.94825 | 18.32292 | 9.87739 |
+
+Sources: [GTCRN](gtcrn_seed42_pilot.md), [LiSenNet](lisennet_seed42_pilot.md),
+[TF-GridNet](tfgridnet_seed42_25ep.md). LiSenNet also has a separate
+[paper-recipe 100-epoch run](paper_alignment.md) whose results are not in this
+table.
+
 ## Runtime records
 
 Both reports specify CPU FP32, batch=1, one thread, one warmup and three timed

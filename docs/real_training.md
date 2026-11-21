@@ -3,8 +3,9 @@
 The real runner connects the existing verified VoiceBank train view to one GTCRN or LiSenNet
 epoch, epoch-boundary state persistence, and a separate complete held-out
 validation command. GTCRN has completed the [25-epoch seed-42 pilot](gtcrn_seed42_pilot.md).
-LiSenNet real-data execution is pending; the draft 100-epoch / three-seed proposal
-is not an accepted final budget.
+LiSenNet completed a 25-epoch unified-recipe pilot (epoch 21 selected). A separate
+paper-recipe 100-epoch run is documented in [paper alignment](paper_alignment.md);
+the unified three-seed proposal is still not an accepted final budget.
 
 ## Inputs and boundaries
 
@@ -143,3 +144,48 @@ force an old run through a new checkout.
 LiSenNet random seed 42 completed 25 real training epochs and 25 independent validations. Validation selected epoch 21; all 824 fixed test utterances were evaluated with PESQ, STOI, SI-SNR and SI-SNR improvement. See [experiment results](lisennet_seed42_pilot.md).
 
 This update supersedes earlier statements that LiSenNet real execution is pending. TF-GridNet real training and a complete three-model comparison remain pending; edge-device efficiency is not established.
+
+## Paper-track LiSenNet — 2026-11-09
+
+The unified runner above remains the controlled benchmark recipe. The separate
+`scripts.train_lisennet_paper` entry point implements LiSenNet's paper recipe:
+2 s crops, batch 4, AdamW 5e-4 with betas (0.8, 0.99), StepLR 0.98, clip 5.0,
+and the PESQ-conditioned `0.9*L_mag + 0.1*L_comp + 0.05*L_adv` objective. A
+100-epoch run is in progress under
+`results/paper_runs/lisennet_paper_seed42_100ep`; see
+[paper alignment](paper_alignment.md) for the full comparison and known
+deviations (speaker-disjoint split, 824-item test).
+
+The paper track was audited on 2026-11-09. The discriminator's two linear head
+layers now use spectral normalization as in the official implementation, the
+learnable sigmoid slope has the official `[1]` shape, the final partial batch is
+retained, and checkpoint selection uses a SHA-256-ranked 200-utterance subset
+spread over the whole 794-utterance held-out split (`validation_sample.json`)
+instead of a truncated stride. A CPU-only regression suite
+(`scripts/smoke_lisennet_paper.py`, 19 checks) pins these corrections. The run
+was restarted at 16:03 after these corrections; the earlier attempts are
+archived under
+`_aborted_lisennet_full_utterance_norm`, `_aborted_lisennet_plain_d_linear` and
+`_aborted_lisennet_tail_batch`. See
+[the training audit](agent_training_audit_2026-11-09.md).
+
+## GTCRN paper-track code — 2026-11-09
+
+`scripts/train_gtcrn_paper.py` is a separate, opt-in track. It uses the
+spectrum-level official loss, Adam 1e-3, `ReduceLROnPlateau` with patience 5,
+batch 4 and sqrt-Hann 512/256. `--epochs` and `--segment-seconds` are required
+because the GTCRN paper does not define a VCTK-DEMAND epoch count or segment
+length; both are recorded as operator choices in `run.json`. The 15-check CPU
+smoke passes, including an aligned noisy/clean crop check. Short pairs are
+wrap-padded, `--resume` pins the manifest and `rows_sha256`, and `run.json`
+records the scored validation count. This track does not replace
+`scripts/train.py`, and no real run has been launched.
+
+Example launch (choose the epoch budget and segment length explicitly):
+
+```sh
+python -m scripts.train_gtcrn_paper \
+  --manifest data/voicebank-demand-16k/train_manifest.json \
+  --run-dir results/paper_runs/gtcrn_paper_seed42 \
+  --epochs N --segment-seconds S --seed 42 --device cuda
+```

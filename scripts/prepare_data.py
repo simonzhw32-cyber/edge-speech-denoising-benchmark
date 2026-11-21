@@ -9,8 +9,13 @@ import re
 import urllib.request
 
 import numpy as np
-import pyarrow.parquet as pq
 import soundfile as sf
+
+try:  # pyarrow wheels can fail to initialize on newer CPython/Windows builds.
+    import pyarrow.parquet as pq
+except ImportError:  # pragma: no cover - exercised on the Windows Python 3.14 host.
+    pq = None
+    import duckdb
 
 from speech_denoising.datasets.voicebank import rows_sha256, sha256_file
 
@@ -38,6 +43,26 @@ def download(url, target, expected_hash, expected_size):
     return target
 
 
+def parquet_rows(path):
+    """Yield row dicts using pyarrow when usable, else duckdb (same columns)."""
+    expected = {"id", "clean", "noisy"}
+    if pq is not None:
+        parquet = pq.ParquetFile(path)
+        if set(parquet.schema_arrow.names) != expected:
+            raise ValueError("Unexpected parquet columns")
+        for batch in parquet.iter_batches(batch_size=16):
+            yield from batch.to_pylist()
+        return
+    connection = duckdb.connect()
+    cursor = connection.execute("select * from read_parquet(?)", [str(path)])
+    names = [description[0] for description in cursor.description]
+    if set(names) != expected:
+        raise ValueError("Unexpected parquet columns")
+    while batch := cursor.fetchmany(16):
+        for values in batch:
+            yield dict(zip(names, values))
+
+
 def prepare(source, split, root, local_parquet=None):
     selected = [x for x in source["files"] if x["path"].startswith(f"data/{split}-")]
     if local_parquet is not None and len(selected) != 1:
@@ -52,41 +77,37 @@ def prepare(source, split, root, local_parquet=None):
             path = Path(local_parquet)
             if path.stat().st_size != shard["size"] or sha256_file(path) != shard["sha256"]:
                 raise ValueError("Local parquet does not match the pinned source")
-        parquet = pq.ParquetFile(path)
-        if set(parquet.schema_arrow.names) != {"id", "clean", "noisy"}:
-            raise ValueError("Unexpected parquet columns")
-        for batch in parquet.iter_batches(batch_size=16):
-            for item in batch.to_pylist():
-                identifier = item["id"]
-                if not isinstance(identifier, str) or not re.fullmatch(r"[A-Za-z0-9_-]+", identifier) or identifier in ids:
-                    raise ValueError("Invalid or duplicate utterance ID")
-                ids.add(identifier)
-                row = {"utterance_id": identifier}
-                lengths = []
-                for role in ("noisy", "clean"):
-                    cell = item[role]
-                    content = cell["bytes"]
-                    if not isinstance(content, bytes) or not content:
-                        raise ValueError("Expected embedded audio bytes")
-                    if cell.get("path") and Path(cell["path"]).stem != identifier:
-                        raise ValueError("Audio filename does not match utterance ID")
-                    signal, sr = sf.read(io.BytesIO(content), dtype="float32")
-                    if sr != 16000 or signal.ndim != 1 or not len(signal) or not np.isfinite(signal).all():
-                        raise ValueError("Expected finite mono 16 kHz audio")
-                    info = sf.info(io.BytesIO(content))
-                    if info.format != "WAV":
-                        raise ValueError("Pinned source unexpectedly contains non-WAV audio")
-                    relative = f"audio/{split}/{role}/{identifier}.wav"
-                    output = root / relative
-                    output.parent.mkdir(parents=True, exist_ok=True)
-                    output.write_bytes(content)  # Preserve original encoded bytes; no resampling or quantization.
-                    row[f"{role}_path"] = relative
-                    row[f"{role}_sha256"] = hashlib.sha256(content).hexdigest()
-                    lengths.append(len(signal))
-                if lengths[0] != lengths[1]:
-                    raise ValueError("Noisy and clean audio lengths differ")
-                row["samples"] = lengths[0]
-                rows.append(row)
+        for item in parquet_rows(path):
+            identifier = item["id"]
+            if not isinstance(identifier, str) or not re.fullmatch(r"[A-Za-z0-9_-]+", identifier) or identifier in ids:
+                raise ValueError("Invalid or duplicate utterance ID")
+            ids.add(identifier)
+            row = {"utterance_id": identifier}
+            lengths = []
+            for role in ("noisy", "clean"):
+                cell = item[role]
+                content = cell["bytes"]
+                if not isinstance(content, bytes) or not content:
+                    raise ValueError("Expected embedded audio bytes")
+                if cell.get("path") and Path(cell["path"]).stem != identifier:
+                    raise ValueError("Audio filename does not match utterance ID")
+                signal, sr = sf.read(io.BytesIO(content), dtype="float32")
+                if sr != 16000 or signal.ndim != 1 or not len(signal) or not np.isfinite(signal).all():
+                    raise ValueError("Expected finite mono 16 kHz audio")
+                info = sf.info(io.BytesIO(content))
+                if info.format != "WAV":
+                    raise ValueError("Pinned source unexpectedly contains non-WAV audio")
+                relative = f"audio/{split}/{role}/{identifier}.wav"
+                output = root / relative
+                output.parent.mkdir(parents=True, exist_ok=True)
+                output.write_bytes(content)  # Preserve original encoded bytes; no resampling or quantization.
+                row[f"{role}_path"] = relative
+                row[f"{role}_sha256"] = hashlib.sha256(content).hexdigest()
+                lengths.append(len(signal))
+            if lengths[0] != lengths[1]:
+                raise ValueError("Noisy and clean audio lengths differ")
+            row["samples"] = lengths[0]
+            rows.append(row)
     rows.sort(key=lambda r: r["utterance_id"])
     if len(rows) != source["expected_counts"][split]:
         raise ValueError("Split count differs from pinned protocol")

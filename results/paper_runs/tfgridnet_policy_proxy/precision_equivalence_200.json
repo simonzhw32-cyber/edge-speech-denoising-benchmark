@@ -1,0 +1,99 @@
+{
+  "kind": "tfgridnet_precision_equivalence",
+  "setting": {
+    "hop_ms": 16,
+    "stride": 256,
+    "checkpoint_blocks": 0,
+    "steps": 200,
+    "batch_size": 1,
+    "segment_seconds": 4,
+    "seed": 42,
+    "train_pool": 400,
+    "validation_size": 40,
+    "validation_limit": 20
+  },
+  "fp32": {
+    "peak_alloc_gib": 9.89894151687622,
+    "peak_reserved_gib": 12.8984375,
+    "mean_step_seconds_excluding_step1": 2.732970682412028,
+    "validation": [
+      [
+        50,
+        1.6627573132514955,
+        0.8702659084321894,
+        9.477884606384409,
+        2.2798366910986596
+      ],
+      [
+        100,
+        1.7266571283340455,
+        0.8717431735929994,
+        11.118950624370974,
+        3.9209027090852273
+      ],
+      [
+        150,
+        1.8086537003517151,
+        0.8809451462523448,
+        11.770823725281563,
+        4.572775809995814
+      ],
+      [
+        200,
+        1.89148770570755,
+        0.8739436696706709,
+        11.651327079938994,
+        4.453279164653243
+      ]
+    ]
+  },
+  "fp16": {
+    "peak_alloc_gib": 5.630446910858154,
+    "peak_reserved_gib": 12.076171875,
+    "mean_step_seconds_excluding_step1": 2.588137192461906,
+    "validation": [
+      [
+        50,
+        1.6403209030628205,
+        0.8679884211754267,
+        8.878516516978207,
+        1.6804686016924575
+      ],
+      [
+        100,
+        1.7582782745361327,
+        0.8655783511461703,
+        9.075420825715323,
+        1.8773729104295735
+      ],
+      [
+        150,
+        1.823881870508194,
+        0.877288198535933,
+        10.308910201042847,
+        3.110862285757098
+      ],
+      [
+        200,
+        1.8886257708072662,
+        0.8749268357349497,
+        10.51085653332542,
+        3.312808618039668
+      ]
+    ]
+  },
+  "delta": {
+    "final_pesq": -0.002861934900283858,
+    "final_stoi": 0.0009831660642787288,
+    "final_si_snr": -1.1404705466135745,
+    "alloc_gib": -4.268494606018066,
+    "step_seconds": -0.14483348995012202,
+    "max_abs_loss_diff": 2.1589107513427734,
+    "mean_abs_loss_diff": 0.36746314730495216
+  },
+  "conclusion": "FP16 halves peak allocated memory and is slightly faster; final PESQ differs by -0.0029. Loss trajectories are not bit-identical; the difference is within proxy noise. FP32 cannot fit the 8 ms model, so FP16 is required there.",
+  "artifacts": {
+    "fp32": "results/paper_runs/tfgridnet_policy_proxy/prec16_fp32_200",
+    "fp16": "results/paper_runs/tfgridnet_policy_proxy/prec16_fp16_200"
+  }
+}

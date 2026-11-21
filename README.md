@@ -1,6 +1,14 @@
 # Edge Speech Denoising Benchmark
 
-> **Current milestone:** GTCRN random seed-42 completed 25 epochs; epoch 24 was selected and evaluated on all 824 test items. See [experiment results](docs/gtcrn_seed42_pilot.md). GTCRN and LiSenNet have separate real training/validation entry points; LiSenNet real-data results are pending.
+> **Current milestone (2026-11-12):** the LiSenNet paper-recipe run completed
+> 110 epochs (full-validation PESQ 2.70486, 824-item test PESQ 3.04565); the
+> 100-epoch artifacts are preserved beside it. The GTCRN paper-track run
+> completed 100 epochs; its fixed-test 824 result is PESQ 2.79621 / STOI 0.94055
+> / SI-SNR 18.74095 (epoch 87 peaked at PESQ 2.85092). TF-GridNet's 8 ms-hop
+> probe OOMed on the 16 GB GPU, so its paper-hop path remains blocked.
+> See [paper alignment](docs/paper_alignment.md) and the
+> [GTCRN](docs/gtcrn_seed42_pilot.md), [LiSenNet](docs/lisennet_seed42_pilot.md)
+> and [TF-GridNet](docs/tfgridnet_seed42_25ep.md) pilot reports.
 
 
 GTCRN, LiSenNet and original TF-GridNet in one codebase, with a shared
@@ -75,6 +83,63 @@ run. Its strict source fingerprints intentionally reject later training-code
 changes. See [restore and evaluate](docs/gtcrn_seed42_pilot.md).
 For new LiSenNet work, see [the real runner commands](docs/real_training.md).
 
+## Three-model pilot comparison
+
+The three 25-epoch pilots below use the same speaker-disjoint split
+(10,778 train / 794 validation / 824 test), 4 s crops, batch 4 and the unified
+negative-SI-SNR objective. They are comparable to each other, not to the
+pretrained baselines or to LiSenNet's paper recipe.
+
+| Model / initialization | Selected epoch | PESQ-WB | STOI | SI-SNR (dB) | Improvement (dB) |
+|---|---|---:|---:|---:|---:|
+| GTCRN / random seed 42 | 24 of 25 | 2.57246 | 0.93428 | 18.70302 | 10.25748 |
+| LiSenNet / random seed 42 | 21 of 25 | 2.57229 | 0.93443 | 18.63120 | 10.18566 |
+| TF-GridNet 6-layer / random seed 42 | 23 of 25 | 2.79501 | 0.94825 | 18.32292 | 9.87739 |
+
+TF-GridNet used gradient accumulation 4 with micro-batch 1 (effective batch 4);
+its RTF is therefore not comparable to the other rows. Sources:
+[GTCRN](docs/gtcrn_seed42_pilot.md), [LiSenNet](docs/lisennet_seed42_pilot.md),
+[TF-GridNet](docs/tfgridnet_seed42_25ep.md).
+
+## Paper recipes
+
+The unified benchmark deliberately does not reproduce each paper's optimizer,
+schedule or loss. The separate [paper-alignment record](docs/paper_alignment.md)
+tabulates paper values against the repository for all three models and documents
+what is executable:
+
+- **LiSenNet** — 100 epochs is defined by the paper. The paper-derived run
+  (2 s crops, AdamW 5e-4, betas (0.8, 0.99), StepLR 0.98, PESQ-conditioned GAN
+  loss) completed 110 epochs under `results/paper_runs/lisennet_paper_seed42_100ep`;
+  full-validation PESQ 2.70486 at epoch 107 and 824-test PESQ 3.04565. Deviations:
+  824-item speaker-disjoint test rather than 872, a 200-utterance PESQ-selection
+  subset, wrap-padded shorts, and non-scale-invariant validation PESQ; see
+  `docs/paper_alignment.md`.
+- **GTCRN** — the paper states STFT, batch 4, Adam 1e-3 with plateau halving and
+  a `0.01/0.7/0.3` SI-SNR/magnitude/RI loss, but **no VCTK epoch count**. A
+  100-epoch budget-parity run completed under
+  `results/paper_runs/gtcrn_paper_seed42_100ep`: epoch 100 test PESQ 2.79621,
+  epoch 87 peaked at 2.85092. `paper_full` has no held-out split, so the last
+  epoch is the protocol result; see `docs/paper_alignment.md`.
+- **TF-GridNet** — the paper has no VoiceBank-DEMAND recipe; its 8 ms hop,
+  sqrt-Hann window and Wav+Mag+MC loss are structural differences from the local
+  16 ms-hop, plain-Hann, negative-SI-SNR profile. The 8 ms, six-layer model
+  cannot train in FP32 on the 16 GB card. The [memory-policy study](docs/tfgridnet_memory_policy_bench.md)
+  measures a 20-step Pareto and proposes cheap-first hierarchical checkpointing;
+  a 200-step paired run and a 100-step attention-only run are loss-bit-identical,
+  so the saving changes memory but not the optimization trajectory; the
+  1,000-step uniform and attention arms both reached PESQ 2.123 with identical
+  losses. A 200-step 16 ms precision pair shows FP16 saves 4.27 GiB with final
+  PESQ within 0.003. The 4-layer DNS check fits at 8 ms and shows the same ordering at a 9 % step-time
+  cost. The
+  [experiment matrix](docs/tfgridnet_experiment_matrix.md) lists E1–E7 status and artifacts. The
+  [paper draft](docs/tfgridnet_paper_draft.md) records the current claims and
+  limitations (single GPU, short proxy, 16 ms fallback), the
+  [submission checklist](docs/tfgridnet_submission_checklist.md) tracks the
+  claim/evidence gaps, the [reviewer FAQ](docs/tfgridnet_reviewer_faq.md)
+  records expected objections, and the
+  [reproduction note](docs/tfgridnet_reproduce.md) lists exact commands.
+
 ## Dataset
 
 [VoiceBank-DEMAND-16k](https://huggingface.co/datasets/JacobLinCool/VoiceBank-DEMAND-16k)
@@ -89,9 +154,10 @@ encoded bytes. Data and generated output stay outside Git.
 ## Install
 
 Use Python 3.10+ and install PyTorch for your platform first. The recorded Windows
-runs used PyTorch 2.14.1. From the repository root:
+runs used Python 3.14.9 and `torch 2.11.0+cu128`. From the repository root:
 
 ```sh
+python -m pip install torch torchaudio --index-url https://download.pytorch.org/whl/cu128
 python -m pip install -r requirements.txt
 python -m pip install -r requirements-benchmark.txt -r requirements-tfgridnet.txt
 python -m pip install Cython wheel
@@ -102,6 +168,36 @@ PESQ needs a C compiler when built from source. For Windows tool installation,
 Git authentication and recovery on a new computer, see [Windows setup](docs/windows_restore.md).
 The `torch-complex` extra supports the historical TF-GridNet reference check;
 production inference uses the local adapter.
+
+## Deploy GTCRN
+
+The GTCRN paper-track checkpoint exports to a 408 KB spectrum-domain ONNX graph.
+On the host i5-12600KF it runs at RTF **0.0073** with four ONNX Runtime threads
+and **0.0100** with one thread (9.77 s utterance), with PyTorch/ONNX parity
+**3.6e-6**. See [GTCRN ONNX deployment](docs/gtcrn_deployment.md) for export,
+benchmark commands, and the phone/board next steps.
+
+```sh
+python -m scripts.export_gtcrn_onnx
+python -m scripts.deploy_gtcrn_onnx --threads 1 \
+  --audio data/voicebank-demand-16k/audio/test/noisy/p232_023.wav \
+  --output results/deploy/gtcrn_p232_023_enhanced.wav
+```
+
+## Deploy TF-GridNet
+
+The pretrained DNS TF-GridNet (`dns_ins20_epoch33`, 2.55M parameters) runs
+offline on CPU and CUDA. On the host i5-12600KF it takes **1.20 s** for a 4 s
+segment with four threads (RTF 0.299) and **83.8 ms** on the RTX 5060 Ti
+(RTF 0.021); 4 s PESQ improves from 1.3359 to 2.8297. See
+[TF-GridNet deployment](docs/tfgridnet_deployment.md) for the full table and
+caveats.
+
+```sh
+python -m scripts.fetch_tfgridnet_checkpoint
+python -m scripts.bench_tfgridnet_inference --device cpu --threads 4 --seconds 4
+python -m scripts.bench_tfgridnet_inference --device cuda --seconds 4
+```
 
 ## Evaluate
 
@@ -147,6 +243,8 @@ python -m scripts.smoke_benchmark
 python -m scripts.smoke_evaluation_cli
 python -m scripts.smoke_gtcrn
 python -m scripts.smoke_lisennet
+python -m scripts.smoke_lisennet_paper
+python -m scripts.smoke_gtcrn_paper
 python -m scripts.smoke_tfgridnet
 ```
 
@@ -155,10 +253,15 @@ reference checks. The pretrained checks additionally require the corresponding
 local weights: `scripts.smoke_gtcrn_pretrained` and `scripts.smoke_tfgridnet_pretrained`.
 Synthetic checks are separate from dataset quality evaluation.
 
-Next work is one LiSenNet real epoch plus complete independent validation,
-followed by a recorded pilot budget. Six-layer TF-GridNet real training remains
-pending. The 25-epoch GTCRN pilot does not establish a completed three-model comparison. Source revisions and original license
-notices live beside each model; [history](docs/history.md) records earlier milestones.
+The one-seed three-model 25-epoch pilot comparison is complete; the multi-seed
+controlled comparison (R7) remains open. Current work is the
+LiSenNet paper-recipe 100-epoch run and a post-run full validation plus 824-item
+test; the unified protocol remains the only controlled cross-model comparison.
+GTCRN has no paper-defined VCTK epoch count, and TF-GridNet's paper does not
+train on VoiceBank-DEMAND, so neither gets a literal “paper 100 epochs” run. See
+[paper alignment](docs/paper_alignment.md) for the full matrix. Source revisions
+and original license notices live beside each model;
+[history](docs/history.md) records earlier milestones.
 
 The [training draft](docs/training_protocol.md) adds a speaker-disjoint split
 planner and synthetic checks. It does not execute training or verify local audio.
@@ -185,3 +288,20 @@ remaining work, dependency roles and the next real-training milestone.
 ## LiSenNet pilot completed — 2026-10-08
 
 25 real training epochs and independent validations completed; epoch 21 selected and evaluated on the fixed 824-utterance test set. See [results and GTCRN comparison](docs/lisennet_seed42_pilot.md). Weights are provided in the `lisennet-seed42-pilot-25ep` Release.
+
+## LiSenNet paper-protocol run
+
+The LiSenNet paper recipe was trained to 110 epochs on the repository's
+speaker-disjoint 10,778/794 split. Full validation selected epoch 107; the fixed
+824-item test split was then evaluated once.
+
+| Split / selected epoch | PESQ-WB | STOI | SI-SNR (dB) | Improvement (dB) |
+|---|---:|---:|---:|---:|
+| 794 held-out / epoch 107 | 2.70486 | 0.88075 | 9.62549 | — |
+| 824 test / epoch 107 | 3.04565 | 0.93616 | 12.96042 | 4.51489 |
+
+Recipe: 2 s crop, batch 4, AdamW 5e-4, betas (0.8, 0.99), StepLR 0.98/epoch,
+clip 5.0, PESQ-conditioned GAN loss. The paper reports PESQ 3.07 on its own
+872-utterance split; this run uses the repository's 824-utterance split, so the
+result is aligned but not an identical reproduction. Details:
+[paper alignment](docs/paper_alignment.md).

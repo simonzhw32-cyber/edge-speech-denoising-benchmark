@@ -63,3 +63,50 @@ comparison remain pending.
 LiSenNet random seed 42 completed 25 real training epochs and 25 independent validations. Validation selected epoch 21; all 824 fixed test utterances were evaluated with PESQ, STOI, SI-SNR and SI-SNR improvement. See [experiment results](lisennet_seed42_pilot.md).
 
 This update supersedes earlier statements that LiSenNet real execution is pending. TF-GridNet real training and a complete three-model comparison remain pending; edge-device efficiency is not established.
+
+## Paper alignment and three-model pilots — 2026-11-09
+
+TF-GridNet completed its 25-epoch unified-recipe pilot (`f8e4489`), so all three
+models now have a seed-42 25-epoch result on the same speaker-disjoint split.
+The [paper alignment](paper_alignment.md) record tabulates the original papers
+against the repository: LiSenNet is the only model with a paper-defined
+VoiceBank recipe and epoch count (100), GTCRN's paper is silent on the VCTK epoch
+budget, and TF-GridNet's paper does not train on VoiceBank-DEMAND. A separate
+LiSenNet paper-recipe 100-epoch run was launched on 2026-11-09 under
+`results/paper_runs/lisennet_paper_seed42_100ep`. This supersedes earlier
+statements that a three-model comparison is pending; it does not convert the
+pilot into a paper reproduction.
+
+## Paper-track audit corrections — 2026-11-09
+
+Two independent read-only audits checked the LiSenNet and TF-GridNet paper
+claims. The LiSenNet audit confirmed the crop-then-normalize order, 2 s / batch 4
+/ AdamW 5e-4 / betas (0.8, 0.99) / StepLR 0.98 / clip 5.0 / 0.9-0.1-0.05 loss,
+and the 36,783-parameter generator. It found two real defects: the two
+discriminator head layers had lost their spectral normalization, and the
+200-utterance selection subset was a truncated stride that never scored the last
+24.7 % of validation. Both were corrected, along with the official `[1]` learnable-sigmoid shape and
+retention of the final partial batch; earlier attempts are archived under
+`_aborted_lisennet_full_utterance_norm`, `_aborted_lisennet_plain_d_linear` and
+`_aborted_lisennet_tail_batch`.
+The current run uses SHA-256-ranked validation selection, logs the LR actually
+used, records real git-dirty state, and hashes the evaluation path as well as the
+training code.
+
+The TF-GridNet audit confirmed the 8 ms vs 16 ms hop mismatch changes activation
+shapes, MACs (2.00x) and memory, but not parameter count (8,381,504). Existing
+checkpoints would load silently under stride 128, so that remains a separate,
+reviewed change; the docs now also record that the repo uses plain Hann rather
+than the paper's sqrt-Hann. No training run was affected by either audit.
+
+## GTCRN paper track implemented — 2026-11-09
+
+Added `configs/gtcrn_paper.yaml`,
+`speech_denoising/training/paper_gtcrn.py`,
+`scripts/train_gtcrn_paper.py` and `scripts/smoke_gtcrn_paper.py`. The track
+keeps `GTCRNNetwork` and the official sqrt-Hann frontend, with a spectrum-level
+loss matching the official `30/70/1` weighting, Adam 1e-3 and
+`ReduceLROnPlateau(min, 0.5, patience=5)`. Fifteen synthetic CPU checks pass (15/15)
+and a 3-step fixture writes a valid run. No real run was launched: the paper
+does not define a VCTK-DEMAND epoch count, so `--epochs` and
+`--segment-seconds` remain required operator inputs and are recorded as such.

@@ -16,8 +16,18 @@ dist/
 *.pt
 *.pth
 *.ckpt
+/exports/
 /checkpoints/*
 !/checkpoints/.gitkeep
 /results/*
 !/results/.gitkeep
 .DS_Store
+
+# local toolchains and research notes (not part of the benchmark)
+/.conda/
+/.conda-env/
+/.python/
+/.research/
+/.tmp/
+/.memsearch/
+install_conda.bat

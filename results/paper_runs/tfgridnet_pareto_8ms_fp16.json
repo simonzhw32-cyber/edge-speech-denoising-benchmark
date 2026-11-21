@@ -1,0 +1,242 @@
+{
+  "kind": "tfgridnet_8ms_fp16_pareto",
+  "measured": "2026-11-12 (attn+whole0-1 added 2026-11-13)",
+  "hardware": "NVIDIA RTX 5060 Ti 16 GB, driver 617.42",
+  "software": "Python 3.14.9, PyTorch 2.11.0+cu128",
+  "model": "6-layer TF-GridNet, 8,381,504 parameters, 4 s input, batch 1",
+  "notes": "one warm-up + 20 measured AdamW steps per fresh process; absolute times include per-process kernel setup; use relative comparisons; attn_whole1 is a dominated control (plot:false)",
+  "rows": [
+    {
+      "policy": "none",
+      "label": "no checkpoint",
+      "hop_ms": 8.0,
+      "precision": "fp16",
+      "whole_blocks": [],
+      "subblocks": [],
+      "peak_alloc_gib": 11.12,
+      "peak_reserved_gib": 13.035,
+      "step_seconds": 3.888,
+      "steps": 20
+    },
+    {
+      "policy": "whole0",
+      "label": "whole block 0",
+      "hop_ms": 8.0,
+      "precision": "fp16",
+      "whole_blocks": [
+        0
+      ],
+      "subblocks": [],
+      "peak_alloc_gib": 9.538,
+      "peak_reserved_gib": 11.143,
+      "step_seconds": 4.465,
+      "steps": 20
+    },
+    {
+      "policy": "whole1",
+      "label": "whole blocks 0-1",
+      "hop_ms": 8.0,
+      "precision": "fp16",
+      "whole_blocks": [
+        0,
+        1
+      ],
+      "subblocks": [],
+      "peak_alloc_gib": 7.947,
+      "peak_reserved_gib": 8.254,
+      "step_seconds": 5.032,
+      "steps": 20
+    },
+    {
+      "policy": "whole2",
+      "label": "whole blocks 0-2",
+      "hop_ms": 8.0,
+      "precision": "fp16",
+      "whole_blocks": [
+        0,
+        1,
+        2
+      ],
+      "subblocks": [],
+      "peak_alloc_gib": 6.36,
+      "peak_reserved_gib": 8.242,
+      "step_seconds": 5.606,
+      "steps": 20
+    },
+    {
+      "policy": "attention",
+      "label": "attention only",
+      "hop_ms": 8.0,
+      "precision": "fp16",
+      "whole_blocks": [],
+      "subblocks": [
+        "attention"
+      ],
+      "peak_alloc_gib": 9.832,
+      "peak_reserved_gib": 11.162,
+      "step_seconds": 3.917,
+      "steps": 20
+    },
+    {
+      "policy": "attn_whole0",
+      "label": "attention + whole 0",
+      "hop_ms": 8.0,
+      "precision": "fp16",
+      "whole_blocks": [
+        0
+      ],
+      "subblocks": [
+        "attention"
+      ],
+      "peak_alloc_gib": 8.502,
+      "peak_reserved_gib": 11.113,
+      "step_seconds": 4.487,
+      "steps": 20
+    },
+    {
+      "policy": "attn_whole1",
+      "label": "attention + whole 0-1",
+      "hop_ms": 8.0,
+      "precision": "fp16",
+      "whole_blocks": [
+        0,
+        1
+      ],
+      "subblocks": [
+        "attention"
+      ],
+      "peak_alloc_gib": 7.173,
+      "peak_reserved_gib": 9.676,
+      "step_seconds": 6.602,
+      "steps": 20,
+      "plot": false,
+      "note": "dominated by whole 0-2 (6.36 GiB, 5.61 s)"
+    },
+    {
+      "policy": "attn_whole2",
+      "label": "attention + whole 0-2",
+      "hop_ms": 8.0,
+      "precision": "fp16",
+      "whole_blocks": [
+        0,
+        1,
+        2
+      ],
+      "subblocks": [
+        "attention"
+      ],
+      "peak_alloc_gib": 5.843,
+      "peak_reserved_gib": 8.236,
+      "step_seconds": 5.62,
+      "steps": 20
+    },
+    {
+      "policy": "whole3",
+      "label": "whole blocks 0-3",
+      "hop_ms": 8.0,
+      "precision": "fp16",
+      "whole_blocks": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "subblocks": [],
+      "peak_alloc_gib": 4.773,
+      "peak_reserved_gib": 6.799,
+      "step_seconds": 6.173,
+      "steps": 20
+    },
+    {
+      "policy": "attn_whole3",
+      "label": "attention + whole 0-3",
+      "hop_ms": 8.0,
+      "precision": "fp16",
+      "whole_blocks": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "subblocks": [
+        "attention"
+      ],
+      "peak_alloc_gib": 4.514,
+      "peak_reserved_gib": 6.797,
+      "step_seconds": 6.187,
+      "steps": 20
+    },
+    {
+      "policy": "whole4",
+      "label": "whole blocks 0-4",
+      "hop_ms": 8.0,
+      "precision": "fp16",
+      "whole_blocks": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "subblocks": [],
+      "peak_alloc_gib": 3.188,
+      "peak_reserved_gib": 5.361,
+      "step_seconds": 6.747,
+      "steps": 20
+    },
+    {
+      "policy": "all_subblocks",
+      "label": "all sub-blocks",
+      "hop_ms": 8.0,
+      "precision": "fp16",
+      "whole_blocks": [],
+      "subblocks": [
+        "intra",
+        "inter",
+        "attention"
+      ],
+      "peak_alloc_gib": 2.783,
+      "peak_reserved_gib": 3.922,
+      "step_seconds": 7.289,
+      "steps": 20
+    }
+  ],
+  "quality_equivalence": {
+    "file": "results/paper_runs/tfgridnet_policy_proxy/quality_equivalence_200.json",
+    "steps": 200,
+    "loss_max_abs_diff": 0.0,
+    "loss_sha256_prefix": "64f94acf24446d2c",
+    "p3": "p3_whole3_200_paired",
+    "p4": "p4_attn_whole3_200_paired",
+    "aba_control_seconds": {
+      "whole3_before": 5.6011,
+      "attention_whole3": 5.6244,
+      "whole3_after": 5.6106
+    },
+    "memory_alloc_gib": {
+      "whole3": 6.359968185424805,
+      "attention_whole3": 5.843684673309326
+    },
+    "validation_pesq": [
+      1.6163813292980194,
+      1.692387878894806,
+      1.813232034444809,
+      1.78326273560524
+    ]
+  },
+  "quality_equivalence_100": {
+    "file": "results/paper_runs/tfgridnet_policy_proxy/quality_equivalence_100.json",
+    "steps": 100,
+    "loss_max_abs_diff": 0.0,
+    "loss_sha256_prefix": "466cba038606ea37",
+    "mean_step_seconds": {
+      "none": 3.862,
+      "attention_cache_release": 3.858,
+      "attention_no_cache_release": 9.125
+    },
+    "peak_alloc_gib": {
+      "none": 11.12,
+      "attention": 9.83
+    }
+  }
+}

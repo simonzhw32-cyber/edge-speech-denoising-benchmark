@@ -1,0 +1,30 @@
+{
+  "kind": "tfgridnet_attention_only_equivalence",
+  "steps": 100,
+  "loss_max_abs_diff": 0.0,
+  "loss_sha256_prefix": "466cba038606ea37",
+  "runs": {
+    "none": "q_none_100",
+    "attention_cache_release": "q_attn_100_cache",
+    "attention_no_cache_release": "q_attn_100"
+  },
+  "mean_step_seconds": {
+    "none": 3.862,
+    "attention_cache_release": 3.858,
+    "attention_no_cache_release": 9.125
+  },
+  "peak_alloc_gib": {
+    "none": 11.120542049407959,
+    "attention": 9.831798553466797
+  },
+  "validation_pesq": {
+    "none": [
+      1.616381162405014,
+      1.692388015985489
+    ],
+    "attention_cache_release": [
+      1.6163811028003692,
+      1.6923873901367188
+    ]
+  }
+}

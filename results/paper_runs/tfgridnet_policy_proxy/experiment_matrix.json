@@ -1,0 +1,58 @@
+[
+  {
+    "id": "E1",
+    "experiment": "8 ms FP16 Pareto",
+    "setting": "11 policies, 20 steps, fresh process",
+    "result": "peak 11.12 \u2192 2.78 GiB; step 3.89 \u2192 7.29 s",
+    "status": "done",
+    "artifact": "results/paper_runs/tfgridnet_pareto_8ms_fp16.json"
+  },
+  {
+    "id": "E2",
+    "experiment": "whole-3 vs attention + whole-3",
+    "setting": "200 steps, seed 42, same data order",
+    "result": "loss max abs diff 0.0; PESQ 1.616/1.692/1.813/1.783",
+    "status": "done",
+    "artifact": "results/paper_runs/tfgridnet_policy_proxy/quality_equivalence_200.json"
+  },
+  {
+    "id": "E3",
+    "experiment": "none vs attention-only",
+    "setting": "100 steps, seed 42",
+    "result": "loss max abs diff 0.0; 11.12 vs 9.83 GiB; 3.862 vs 3.858 s",
+    "status": "done",
+    "artifact": "results/paper_runs/tfgridnet_policy_proxy/quality_equivalence_100.json"
+  },
+  {
+    "id": "E4",
+    "experiment": "4-layer DNS boundary",
+    "setting": "8 ms FP16, 20 steps",
+    "result": "2.17 vs 1.63 GiB; 0.173 vs 0.189 s (+9%)",
+    "status": "done",
+    "artifact": "results/paper_runs/tfgridnet_dns4_8ms.json"
+  },
+  {
+    "id": "E5",
+    "experiment": "second GPU",
+    "setting": "24 GB / data-center GPU",
+    "result": "not run",
+    "status": "pending",
+    "artifact": null
+  },
+  {
+    "id": "E6",
+    "experiment": "1,000-step quality pair",
+    "setting": "8 ms FP16, 1,000 steps, 20-utt proxy",
+    "result": "PESQ 2.122956 (uniform) vs 2.122954 (attention); loss hash equal",
+    "status": "done",
+    "artifact": "results/paper_runs/tfgridnet_policy_proxy/quality_equivalence_1000.json"
+  },
+  {
+    "id": "E7",
+    "experiment": "16 ms FP32 vs FP16",
+    "setting": "200 steps, no checkpoint, seed 42",
+    "result": "9.90 vs 5.63 GiB; final PESQ 1.891 vs 1.889; loss not bit-identical",
+    "status": "done",
+    "artifact": "results/paper_runs/tfgridnet_policy_proxy/precision_equivalence_200.json"
+  }
+]

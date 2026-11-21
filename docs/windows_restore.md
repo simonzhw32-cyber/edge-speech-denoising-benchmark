@@ -35,7 +35,7 @@ the agreement with the group; opening it is not required for local restoration.
 From the repository root:
 
 ```bat
-python -m pip install torch==2.14.1 --index-url https://pypi.org/simple
+python -m pip install torch torchaudio --index-url https://download.pytorch.org/whl/cu128
 python -m pip install -r requirements.txt --index-url https://pypi.org/simple
 python -m pip install -r requirements-benchmark.txt -r requirements-tfgridnet.txt --index-url https://pypi.org/simple
 ```
@@ -48,12 +48,13 @@ python -m pip install pesq==0.0.4 --no-build-isolation --index-url https://pypi.
 python -c "from pesq import pesq; print('PASS: PESQ import')"
 ```
 
-If PESQ reports that Microsoft Visual C++ is missing, install the C++ workload
-and recommended components from the official
+If PESQ reports that Microsoft Visual C++ is missing, either install the C++
+workload and recommended components from the official
 [Build Tools installer](https://aka.ms/vs/17/release/vs_buildtools.exe).
 The installation parameters are documented by
 [Microsoft](https://learn.microsoft.com/en-us/visualstudio/install/use-command-line-parameters-to-install-visual-studio?view=vs-2022).
-Reopen CMD and retry the PESQ installation. Without that backend, explicitly
+Reopen CMD and retry the PESQ installation. The conda-forge prebuilt package
+documented below is an alternative on Python 3.14/Windows. Without PESQ, explicitly
 omit PESQ from the requested metrics; keep the report labeled partial coverage.
 
 ## Weights, data and checks
@@ -124,6 +125,24 @@ there is no separate missing training dependency to add. The legacy TF-GridNet
 reference additionally needs `requirements-tfgridnet.txt`. PESQ and its build
 tools are needed for complete quality evaluation, not for the SI-SNR loss.
 
+### Actual 2026-11-09 local training environment
+
+The paper-track run was brought up on a Windows host with an RTX 5060 Ti
+(compute capability 12.0) using Miniconda's Python 3.14.9 and
+`torch 2.11.0+cu128`; `torch.cuda.is_available()` is `True`. This combination
+differs from the archived 3.13/2.14.1+cu130 probes above, so keep the
+environment record with the run.
+
+Two host-specific workarounds were needed:
+
+- `pyarrow 26.0.1` fails to initialize its DLLs (`WinError 4551`) on this
+  Python/Windows build. `scripts.prepare_data` therefore falls back to
+  `duckdb 2.0.0` for reading the pinned parquet shards.
+- `pip install pesq==0.0.4` requires MSVC. The conda-forge win-64 py314 build
+  (`pesq-0.0.4-py314h2dcd201_7.conda`) can be extracted and its `pesq` package
+  copied into `Lib/site-packages`; verify with
+  `python -c "from pesq import pesq; print(pesq(16000, x, x, 'wb'))"`.
+
 For planned training, restore the parent train source if it is missing:
 
 ```bat
@@ -135,9 +154,11 @@ output filename when an old report exists. Archived preflight reports contain
 paths from the old machine and do not replace a newly prepared local manifest.
 Do not restart a full 824-item benchmark merely to restore the training setup.
 
-The current training CLI still accepts only descriptions or synthetic fixtures.
-Do not expect a real-data run until the next implementation milestone described
-in [project requirements](project_requirements.md) has been completed.
+The real-data runner is implemented: `scripts.train --real` supports GTCRN,
+LiSenNet and TF-GridNet, and `scripts.validate --real` performs independent
+held-out validation. See [verified real training](real_training.md) for the
+current commands. Historical archived runs may still reject resume because their
+source/runtime fingerprints intentionally differ.
 
 Retain real training checkpoints separately once training begins: `checkpoints/`
 and `results/` are ignored, so pushing code will not preserve learned weights.
